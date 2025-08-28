@@ -1,7 +1,8 @@
 {% comment %}
   EcomExperts Test – Custom Banner Section (no jQuery)
-  - Mobile: hamburger at left that morphs to X when toggled and reveals a dropdown with tagline + CTA
-  - Editable fields: brand, tagline, top CTA, title, subtitle, main CTA, strip, background.
+  - Mobile: hamburger at left that morphs to X and reveals a dropdown with tagline + CTA
+  - Mobile hero: text on white first, image below with overlaid SHOP NOW button
+  - Desktop: smaller title/subtitle per request
 {% endcomment %}
 
 <section id="ee-banner-{{ section.id }}" class="ee-banner">
@@ -22,7 +23,7 @@
     {% endif %}
   </div>
 
-  {%- comment -%} Mobile dropdown panel (shown when hamburger open) {%- endcomment -%}
+  <!-- Mobile dropdown panel -->
   <div id="ee-mobile-drawer-{{ section.id }}" class="ee-mobile-drawer" aria-hidden="true">
     <p class="ee-mobile-tagline">{{ section.settings.tagline }}</p>
     {% if section.settings.top_cta_text != blank %}
@@ -47,7 +48,6 @@
       {% if section.settings.subtitle != blank %}
         <p class="ee-banner__subtitle">{{ section.settings.subtitle }}</p>
       {% endif %}
-
       {% if section.settings.main_cta_text != blank %}
         <a class="ee-btn ee-btn--primary" href="{{ section.settings.main_cta_link | default: '#' }}">
           <span>{{ section.settings.main_cta_text }}</span>
@@ -56,8 +56,15 @@
       {% endif %}
     </div>
 
-    <!-- Mobile-only image block (keeps text on white, image below) -->
-    <div class="ee-hero-img" aria-hidden="true"></div>
+    <!-- Mobile-only image + overlay button -->
+    <div class="ee-hero-img" aria-hidden="true">
+      {% if section.settings.main_cta_text != blank %}
+        <a class="ee-btn ee-btn--primary ee-btn--mobile-overlay" href="{{ section.settings.main_cta_link | default: '#' }}">
+          <span>{{ section.settings.main_cta_text }}</span>
+          <span class="ee-arrow" aria-hidden="true">→</span>
+        </a>
+      {% endif %}
+    </div>
   </div>
 
   {% if section.settings.bottom_strip != blank %}
@@ -78,22 +85,17 @@
     --gray: #efefef;
   }
 
-  /* Top bar layout (desktop default) */
+  /* Top bar layout */
   #ee-banner-{{ section.id }} .ee-banner__topbar{
     display:grid; grid-template-columns:auto 1fr auto; align-items:center;
     gap:16px; background:#f3f3f3; padding:10px var(--pad); font-weight:600;
   }
   #ee-banner-{{ section.id }} .ee-banner__brand{ justify-self:start; }
   #ee-banner-{{ section.id }} .ee-banner__tagline{ justify-self:center; text-align:center; }
-  #ee-banner-{{ section.id }} .ee-banner__topbar .ee-btn--top{
-    justify-self:end; width:max-content; white-space:nowrap;
-  }
+  #ee-banner-{{ section.id }} .ee-banner__topbar .ee-btn--top{ justify-self:end; width:max-content; white-space:nowrap; }
 
-  /* Hamburger (hidden on desktop) */
-  #ee-banner-{{ section.id }} .ee-hamburger{
-    display:none; position:relative; width:32px; height:28px;
-    background:transparent; border:none; padding:0; cursor:pointer;
-  }
+  /* Hamburger */
+  #ee-banner-{{ section.id }} .ee-hamburger{ display:none; position:relative; width:32px; height:28px; background:transparent; border:none; padding:0; cursor:pointer; }
   #ee-banner-{{ section.id }} .ee-hamburger__bar,
   #ee-banner-{{ section.id }} .ee-hamburger__bar::before,
   #ee-banner-{{ section.id }} .ee-hamburger__bar::after{
@@ -103,7 +105,6 @@
   #ee-banner-{{ section.id }} .ee-hamburger__bar{ top:50%; transform:translateY(-50%); }
   #ee-banner-{{ section.id }} .ee-hamburger__bar::before{ top:-8px; }
   #ee-banner-{{ section.id }} .ee-hamburger__bar::after{ bottom:-8px; }
-  /* Morph to X when open */
   #ee-banner-{{ section.id }} .ee-hamburger[aria-expanded="true"] .ee-hamburger__bar{ background:transparent; }
   #ee-banner-{{ section.id }} .ee-hamburger[aria-expanded="true"] .ee-hamburger__bar::before{ top:0; transform:rotate(45deg); }
   #ee-banner-{{ section.id }} .ee-hamburger[aria-expanded="true"] .ee-hamburger__bar::after{ bottom:0; transform:rotate(-45deg); }
@@ -112,24 +113,22 @@
   #ee-banner-{{ section.id }} .ee-btn{
     position:relative; overflow:hidden; isolation:isolate;
     display:inline-flex; align-items:center; gap:.5rem;
-    padding:.55rem 1.2rem;
-    text-decoration:none; line-height:1; cursor:pointer;
+    padding:.55rem 1.2rem; text-decoration:none; line-height:1; cursor:pointer;
     border:none; outline:none; width:max-content; white-space:nowrap;
   }
-  /* Left→Right fill animation via ::before (slower) */
+  /* Left→Right fill animation */
   #ee-banner-{{ section.id }} .ee-btn::before{
     content:""; position:absolute; inset:0; transform:scaleX(0);
-    transform-origin:left; transition:transform .6s ease;
-    z-index:-1;
+    transform-origin:left; transition:transform .6s ease; z-index:-1;
   }
   #ee-banner-{{ section.id }} .ee-btn:hover::before{ transform:scaleX(1); }
 
-  /* Top right button (CHOOSE GIFT): yellow base → black on hover */
+  /* Top CTA */
   #ee-banner-{{ section.id }} .ee-btn--top{ background:var(--accent); color:#000; font-weight:600; }
   #ee-banner-{{ section.id }} .ee-btn--top::before{ background:#000; }
   #ee-banner-{{ section.id }} .ee-btn--top:hover{ color:#fff; }
 
-  /* Main CTA (SHOP NOW): black → yellow on hover */
+  /* Main CTA */
   #ee-banner-{{ section.id }} .ee-btn--primary{ background:#000; color:#fff; padding:.65rem 1.3rem; }
   #ee-banner-{{ section.id }} .ee-btn--primary::before{ background:var(--accent); }
   #ee-banner-{{ section.id }} .ee-btn--primary:hover{ color:#000; }
@@ -139,43 +138,29 @@
   #ee-banner-{{ section.id }} .ee-btn .ee-arrow{ margin-left:.4rem; display:inline-block; }
   #ee-banner-{{ section.id }} .ee-btn:hover .ee-arrow{ animation:arrow-blink .8s infinite; }
 
-  /* Mobile dropdown panel (hidden on desktop; slide with max-height) */
-  #ee-banner-{{ section.id }} .ee-mobile-drawer{
-    display:none; overflow:hidden; max-height:0; transition:max-height .3s ease, padding .3s ease;
-    background:#fff; padding:0 var(--pad); text-align:center; box-shadow:0 0 0 transparent;
-  }
-  #ee-banner-{{ section.id }}.menu-open .ee-mobile-drawer{
-    max-height:220px; padding:14px var(--pad) 18px; box-shadow:0 2px 0 #e8e8e8;
-  }
+  /* Mobile drawer */
+  #ee-banner-{{ section.id }} .ee-mobile-drawer{ display:none; overflow:hidden; max-height:0; transition:max-height .3s ease, padding .3s ease; background:#fff; padding:0 var(--pad); text-align:center; box-shadow:0 0 0 transparent; }
+  #ee-banner-{{ section.id }}.menu-open .ee-mobile-drawer{ max-height:220px; padding:14px var(--pad) 18px; box-shadow:0 2px 0 #e8e8e8; }
   #ee-banner-{{ section.id }} .ee-mobile-tagline{ margin:0 0 12px; font-weight:600; }
 
-  /* Hero (desktop: text sits in white area above image) */
+  /* Hero (desktop) — text sits in white band, image in background */
   #ee-banner-{{ section.id }} .ee-banner__hero{
     background: var(--white);
     background-image: var(--bg);
-    background-size: cover; background-position: center 40%; /* push art slightly down */
+    background-size: cover; background-position: center 40%;
     min-height: 520px;
-
-    display:flex;
-    align-items:flex-end;         /* push inner to bottom */
-    justify-content:center;
-    position:relative;
+    display:flex; align-items:flex-end; justify-content:center; position:relative;
   }
   #ee-banner-{{ section.id }} .ee-banner__inner{
     width:100%; max-width:var(--max);
-    padding: 36px var(--pad) 56px;  /* bottom padding like comp */
+    padding: 36px var(--pad) 56px;
     text-align:left;
   }
-  /* Slightly smaller text to fit in white band */
-  #ee-banner-{{ section.id }} .ee-banner__title{
-    font-size: clamp(36px, 5.2vw, 72px);
-    line-height:1.05; margin:.2em 0 .1em;
-  }
-  #ee-banner-{{ section.id }} .ee-banner__subtitle{
-    max-width: 680px; font-size: .98rem; line-height:1.55; color:#333;
-  }
+  /* Desktop: ~50% smaller title + smaller subtitle */
+  #ee-banner-{{ section.id }} .ee-banner__title{ font-size: clamp(24px, 3vw, 36px); line-height:1.1; margin:.2em 0 .1em; }
+  #ee-banner-{{ section.id }} .ee-banner__subtitle{ max-width: 560px; font-size: .75rem; line-height:1.5; color:#333; }
 
-  /* Mobile image block: hidden on desktop */
+  /* Mobile image block hidden on desktop */
   #ee-banner-{{ section.id }} .ee-hero-img{ display:none; }
 
   /* Bottom strip */
@@ -184,50 +169,34 @@
     background:#eee; font-size:.78rem; padding:8px 12px; border-top:1px solid #ddd; letter-spacing:.06em;
   }
 
-  /* Mobile */
+  /* ---------- Mobile ---------- */
   @media (max-width: 768px){
-    /* show hamburger; center brand; hide tagline + top CTA in topbar */
+    /* Header */
     #ee-banner-{{ section.id }} .ee-hamburger{ display:block; }
     #ee-banner-{{ section.id }} .ee-banner__brand{ justify-self:center; }
     #ee-banner-{{ section.id }} .ee-banner__tagline,
     #ee-banner-{{ section.id }} .ee-banner__topbar .ee-btn--top{ display:none; }
-
-    /* enable drawer on mobile */
     #ee-banner-{{ section.id }} .ee-mobile-drawer{ display:block; }
+    #ee-banner-{{ section.id }} .ee-banner__topbar{ grid-template-columns: auto 1fr auto; font-size:1rem; padding: 12px var(--pad); }
 
-    #ee-banner-{{ section.id }} .ee-banner__topbar{
-      grid-template-columns: auto 1fr auto;
-      font-size:1rem; padding: 12px var(--pad);
-    }
+    /* Text first on white */
+    #ee-banner-{{ section.id }} .ee-banner__hero{ background:none; min-height:auto; align-items:stretch; }
+    #ee-banner-{{ section.id }} .ee-banner__inner{ text-align:center; padding: 22px var(--pad) 12px; background:#fff; }
+    #ee-banner-{{ section.id }} .ee-banner__title{ font-size: 1.7rem; margin-bottom:.45rem; }
+    #ee-banner-{{ section.id }} .ee-banner__subtitle{ font-size:.95rem; max-width: 92%; margin:0 auto .8rem; }
 
-    /* MOBILE: text on white first, image below */
-    #ee-banner-{{ section.id }} .ee-banner__hero{
-      background:none;            /* remove background from container */
-      min-height:auto;            /* let content define height */
-      align-items:stretch;
-    }
-    #ee-banner-{{ section.id }} .ee-banner__inner{
-      text-align:center;
-      padding: 22px var(--pad) 16px;   /* compact and in white area */
-      background:#fff;
-    }
-    #ee-banner-{{ section.id }} .ee-banner__title{
-      font-size: 1.75rem;         /* ~28px */
-      margin-bottom:.5rem;
-    }
-    #ee-banner-{{ section.id }} .ee-banner__subtitle{
-      font-size:.95rem; max-width: 92%; margin:0 auto 1rem; line-height:1.5;
-    }
-    #ee-banner-{{ section.id }} .ee-btn--primary{
-      margin: 0 auto; display:inline-flex;
-    }
+    /* Hide desktop button and show overlay one */
+    #ee-banner-{{ section.id }} .ee-banner__inner .ee-btn--primary{ display:none; }
 
-    /* The image portion appears below text */
+    /* Image below with overlay button */
     #ee-banner-{{ section.id }} .ee-hero-img{
-      display:block; height: 230px;      /* adjust to match comp height */
-      background-image: var(--bg);
-      background-size: cover;
-      background-position: center;
+      display:block; height: 240px;
+      background-image: var(--bg); background-size: cover; background-position:center;
+      position:relative;
+    }
+    #ee-banner-{{ section.id }} .ee-btn--mobile-overlay{
+      position:absolute; left:50%; transform:translateX(-50%);
+      bottom:18px;
     }
 
     /* Bottom strip tighter */
