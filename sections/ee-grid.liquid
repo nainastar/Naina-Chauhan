@@ -134,11 +134,16 @@
               aria-expanded="false"
               aria-controls="ee-dd-list-{{ section.id }}"
             >
-              <span class="ee-dd__caret-icon">▾</span>
+              <span class="ee-dd__caret-icon"></span>
             </button>
           </div>
 
-          <ul id="ee-dd-list-{{ section.id }}" class="ee-dd__list" role="listbox" aria-labelledby="ee-size-label-{{ section.id }}"></ul>
+          <ul
+            id="ee-dd-list-{{ section.id }}"
+            class="ee-dd__list"
+            role="listbox"
+            aria-labelledby="ee-size-label-{{ section.id }}"
+          ></ul>
         </div>
 
         <button type="submit" class="ee-btn ee-btn--add">
@@ -347,29 +352,66 @@
     let selectedSize = '';
 
     /* ---- Helpers for color swatch rail ---- */
-    function colorToHex(str){
+    function colorToHex(str) {
       if (!str) return '#000';
       const s = String(str).trim().toLowerCase();
       if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(s)) return s;
       const map = {
-        black:'#000000', white:'#ffffff', blue:'#1e3a8a', navy:'#001f3f', 'royal blue':'#4169e1',
-        'sky blue':'#87ceeb', red:'#e11d48', maroon:'#800000', burgundy:'#800020',
-        green:'#16a34a', 'dark green':'#006400', olive:'#6b8e23', lime:'#32cd32',
-        teal:'#008080', cyan:'#00ffff', aqua:'#00ffff', yellow:'#facc15', gold:'#d4af37',
-        mustard:'#e1ad01', orange:'#f97316', coral:'#ff7f50', peach:'#ffdab9',
-        purple:'#7e22ce', violet:'#8a2be2', lavender:'#e6e6fa', magenta:'#ff00ff',
-        pink:'#ec4899', 'hot pink':'#ff69b4', brown:'#8b4513', tan:'#d2b48c',
-        khaki:'#c3b091', beige:'#f5f5dc', ivory:'#fffff0', cream:'#fffdd0',
-        grey:'#808080', gray:'#808080', charcoal:'#36454f', silver:'#c0c0c0'
+        black: '#000000',
+        white: '#ffffff',
+        blue: '#1e3a8a',
+        navy: '#001f3f',
+        'royal blue': '#4169e1',
+        'sky blue': '#87ceeb',
+        red: '#e11d48',
+        maroon: '#800000',
+        burgundy: '#800020',
+        green: '#16a34a',
+        'dark green': '#006400',
+        olive: '#6b8e23',
+        lime: '#32cd32',
+        teal: '#008080',
+        cyan: '#00ffff',
+        aqua: '#00ffff',
+        yellow: '#facc15',
+        gold: '#d4af37',
+        mustard: '#e1ad01',
+        orange: '#f97316',
+        coral: '#ff7f50',
+        peach: '#ffdab9',
+        purple: '#7e22ce',
+        violet: '#8a2be2',
+        lavender: '#e6e6fa',
+        magenta: '#ff00ff',
+        pink: '#ec4899',
+        'hot pink': '#ff69b4',
+        brown: '#8b4513',
+        tan: '#d2b48c',
+        khaki: '#c3b091',
+        beige: '#f5f5dc',
+        ivory: '#fffff0',
+        cream: '#fffdd0',
+        grey: '#808080',
+        gray: '#808080',
+        charcoal: '#36454f',
+        silver: '#c0c0c0',
       };
       return map[s] || '#000';
     }
-    function isLight(hex){
-      const c = hex.replace('#','');
-      let r,g,b;
-      if (c.length===3){ r=parseInt(c[0]+c[0],16); g=parseInt(c[1]+c[1],16); b=parseInt(c[2]+c[2],16); }
-      else{ r=parseInt(c.slice(0,2),16); g=parseInt(c.slice(2,4),16); b=parseInt(c.slice(4,6),16); }
-      const yiq=(r*299+g*587+b*114)/1000; return yiq>200;
+    function isLight(hex) {
+      const c = hex.replace('#', '');
+      let r, g, b;
+      if (c.length === 3) {
+        r = parseInt(c[0] + c[0], 16);
+        g = parseInt(c[1] + c[1], 16);
+        b = parseInt(c[2] + c[2], 16);
+      } else {
+        r = parseInt(c.slice(0, 2), 16);
+        g = parseInt(c.slice(2, 4), 16);
+        b = parseInt(c.slice(4, 6), 16);
+      }
+      const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+      return yiq > 200;
     }
 
     /* ---- Modal open/close ---- */
@@ -382,24 +424,26 @@
       document.documentElement.style.overflow = '';
       msgEl.textContent = '';
       dd.classList.remove('open');
-      ddBtns.forEach(b => b.setAttribute('aria-expanded','false'));
+      ddBtns.forEach((b) => b.setAttribute('aria-expanded', 'false'));
     };
 
     closeBtn.addEventListener('click', close);
     backdrop.addEventListener('click', close);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+    });
 
     /* ---- Dropdown open/close (either half toggles) ---- */
-    ddBtns.forEach(btn=>{
-      btn.addEventListener('click', ()=>{
+    ddBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
         const openState = dd.classList.toggle('open');
-        ddBtns.forEach(b => b.setAttribute('aria-expanded', openState ? 'true' : 'false'));
+        ddBtns.forEach((b) => b.setAttribute('aria-expanded', openState ? 'true' : 'false'));
       });
     });
     document.addEventListener('click', (e) => {
       if (!dialog.contains(e.target)) {
         dd.classList.remove('open');
-        ddBtns.forEach(b => b.setAttribute('aria-expanded','false'));
+        ddBtns.forEach((b) => b.setAttribute('aria-expanded', 'false'));
       }
     });
 
@@ -436,7 +480,7 @@
             /* set swatch rail color */
             const hex = colorToHex(val);
             pill.style.setProperty('--swatch', hex);
-            if (isLight(hex)) pill.setAttribute('data-swatch-light','true');
+            if (isLight(hex)) pill.setAttribute('data-swatch-light', 'true');
 
             pill.addEventListener('click', () => {
               block.querySelectorAll('.ee-pill').forEach((el) => el.setAttribute('aria-pressed', 'false'));
@@ -464,9 +508,9 @@
           li.setAttribute('role', 'option');
           li.addEventListener('click', () => {
             selectedSize = v;
-            ddLabel.textContent = v;          // centered in trigger
+            ddLabel.textContent = v; // centered in trigger
             dd.classList.remove('open');
-            ddBtns.forEach(b => b.setAttribute('aria-expanded','false'));
+            ddBtns.forEach((b) => b.setAttribute('aria-expanded', 'false'));
           });
           ddList.appendChild(li);
         });
@@ -488,6 +532,69 @@
         })
       );
     }
+    // Refreshes cart count and (if present) the theme's cart drawer using Sections Rendering API.
+    // Works on Dawn-like themes and falls back to just updating the count.
+    // Call after any successful /cart/add.js call.
+    async function refreshCartUI({ openDrawer = true } = {}) {
+      try {
+        // Always get latest cart (no cache)
+        const cart = await (
+          await fetch('/cart.js', { cache: 'no-store', headers: { Accept: 'application/json' } })
+        ).json();
+
+        // Update common cart-count targets (covers many themes)
+        const countTargets = document.querySelectorAll(
+          '[data-cart-count], [data-cart-items-count], .cart-count-bubble .cart-count, .header__icon--cart .cart-count'
+        );
+        countTargets.forEach((el) => {
+          el.textContent = cart.item_count;
+          // unhide bubbles if your theme hides them at 0
+          el.closest('.cart-count-bubble')?.classList.toggle('hidden', cart.item_count === 0);
+        });
+
+        // Try to re-render cart-related sections (Dawn & similar)
+        const sectionsToRender = ['cart-drawer', 'cart-icon-bubble'].filter((id) =>
+          document.getElementById(`shopify-section-${id}`)
+        );
+        if (sectionsToRender.length) {
+          const res = await fetch(`/?sections=${sectionsToRender.join(',')}`, {
+            headers: { 'Cache-Control': 'no-cache' },
+          });
+          const html = await res.json();
+          sectionsToRender.forEach((id) => {
+            const container = document.getElementById(`shopify-section-${id}`);
+            if (container && html[id]) container.innerHTML = html[id];
+          });
+        }
+
+        // Open cart drawer if the theme provides one (best-effort across themes)
+        if (openDrawer) {
+          const drawer =
+            document.querySelector('cart-drawer') ||
+            document.getElementById('CartDrawer') ||
+            document.querySelector('.js-drawer-open-cart');
+          if (drawer) {
+            // a few common open mechanisms:
+            try {
+              drawer.setAttribute?.('open', '');
+            } catch {}
+            try {
+              drawer.open = true;
+            } catch {}
+            try {
+              typeof drawer.openDrawer === 'function' && drawer.openDrawer();
+            } catch {}
+            drawer.classList?.add('is-open');
+          }
+        }
+
+        // Notify any theme listeners
+        window.dispatchEvent(new CustomEvent('cart:refresh', { detail: { cart } }));
+        document.dispatchEvent(new CustomEvent('cart:refresh', { detail: { cart } }));
+      } catch (err) {
+        console.error('Cart refresh failed:', err);
+      }
+    }
 
     /* ---- Add to cart ---- */
     form.addEventListener('submit', async (e) => {
@@ -500,27 +607,37 @@
         return;
       }
 
-      await fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: v.id, quantity: 1 }),
-      });
-
-      /* Bonus: auto add when Color=Black & Size=Medium */
-      const colorName = (activeProduct.options.find((o) => /color/i.test(o.name)) || {}).name;
-      const pickedColor = colorName ? chosen[colorName] || '' : '';
-      const pickedSize = selectedSize || '';
-
-      if (/black/i.test(pickedColor) && /medium/i.test(pickedSize) && payload.autoAdd && payload.autoAdd.variant_id) {
+      try {
+        // Add main product
         await fetch('/cart/add.js', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: payload.autoAdd.variant_id, quantity: 1 }),
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ id: v.id, quantity: 1 }),
+          cache: 'no-store',
         });
-      }
 
-      msgEl.textContent = 'Added to cart ✔';
-      setTimeout(close, 650);
+        // Bonus auto-add when Color=Black & Size=Medium
+        const colorName = (activeProduct.options.find((o) => /color/i.test(o.name)) || {}).name;
+        const pickedColor = colorName ? chosen[colorName] || '' : '';
+        const pickedSize = selectedSize || '';
+        if (/black/i.test(pickedColor) && /medium/i.test(pickedSize) && payload.autoAdd && payload.autoAdd.variant_id) {
+          await fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ id: payload.autoAdd.variant_id, quantity: 1 }),
+            cache: 'no-store',
+          });
+        }
+
+        // 🔁 Immediately refresh the cart UI and open the drawer (if present)
+        await refreshCartUI({ openDrawer: true });
+
+        msgEl.textContent = 'Added to cart ✔';
+        setTimeout(close, 650);
+      } catch (err) {
+        console.error(err);
+        msgEl.textContent = 'Something went wrong adding to cart.';
+      }
     });
   })();
 </script>
