@@ -669,6 +669,7 @@
         await refreshCartUI({ openDrawer: true });
 
         msgEl.textContent = 'Added to cart ✔';
+        window.location.reload();
         setTimeout(close, 650);
       } catch (err) {
         console.error(err);
