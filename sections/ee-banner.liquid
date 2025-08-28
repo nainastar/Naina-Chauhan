@@ -241,11 +241,10 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-     #ee-banner-{{ section.id }} .ee-banner__strip{
-        padding: 8px 10px;      /* a touch more room */
-        font-size: .72rem;      /* slightly larger than before so it reads fully */
-        line-height: 1.25;
-        letter-spacing: .06em;  /* keep the style */
+    #ee-banner-{{ section.id }} .ee-banner__strip span{
+    white-space: normal;      /* allow wrapping */
+    word-break: break-word;   /* break long words if needed */
+    text-align: center;
     }
   }
 </style>
