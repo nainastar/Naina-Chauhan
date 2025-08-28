@@ -235,6 +235,52 @@
         display: -webkit-box;
     }
   }
+
+  /* ---- Fluid, responsive type for the whole banner ---- */
+#ee-banner-{{ section.id }}{
+  /* min -> fluid -> max */
+  --fs-brand:     clamp(14px, 1.6vw, 18px);
+  --fs-tagline:   clamp(12px, 1.4vw, 16px);
+  --fs-title:     clamp(26px, 5.5vw, 36px);   /* smaller desktop per brief */
+  --fs-subtitle:  clamp(13px, 1.6vw, 15px);   /* readable but compact */
+  --fs-btn:       clamp(12px, 1.2vw, 14px);
+  --fs-strip:     clamp(11px, 1.1vw, 13px);
+}
+
+/* Apply the scales */
+#ee-banner-{{ section.id }} .ee-banner__brand{ font-size: var(--fs-brand); }
+#ee-banner-{{ section.id }} .ee-banner__tagline{ font-size: var(--fs-tagline); }
+
+#ee-banner-{{ section.id }} .ee-banner__title{
+  font-size: var(--fs-title) !important;      /* override earlier size */
+  line-height: 1.1;
+}
+
+#ee-banner-{{ section.id }} .ee-banner__subtitle{
+  font-size: var(--fs-subtitle) !important;
+}
+
+/* Buttons */
+#ee-banner-{{ section.id }} .ee-btn{
+  font-size: var(--fs-btn);
+}
+
+/* Bottom strip */
+#ee-banner-{{ section.id }} .ee-banner__strip{
+  font-size: var(--fs-strip) !important;
+}
+
+/* Keep mobile two-line clamp for subtitle (your existing rules) */
+@media (max-width: 768px){
+  #ee-banner-{{ section.id }} .ee-banner__subtitle{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 </style>
 
 <script>
