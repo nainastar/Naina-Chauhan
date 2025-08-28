@@ -164,13 +164,6 @@
   /* MOBILE: 2 columns */
   @media(max-width:640px){ .ee-grid__wrap{ grid-template-columns:repeat(2,1fr); } }
 
-  /* MOBILE: center heading, no left/right margin */
-  @media(max-width:640px){
-    .ee-grid__head{ margin: 0 0 24px 0; padding: 0; max-width: 100%; }
-    .ee-grid__title{ text-align: center; margin-left: 0; margin-right: 0; }
-    .ee-card__img img{ height: 150px; }
-  }
-
   .ee-card{ position:relative; overflow:hidden; }
   .ee-card__img img{ display:block; width:100%; object-fit:cover; height: 350px; }
   .ee-card__open{ font-size: 23px;position:absolute; right:10px; top:10px; width:32px; height:32px; border-radius:50%; background:#fff; border:1px solid #d9d9d9; cursor:pointer; }
@@ -314,6 +307,12 @@
   .ee-btn:hover{ background:#000; color:#fff; }
 
   @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+    /* MOBILE: center heading, no left/right margin */
+  @media(max-width:640px){
+    .ee-grid__head{ margin: 0 0 24px 0; padding: 0; max-width: 100%; }
+    .ee-grid__title{ text-align: center; margin-left: 0; margin-right: 0; }
+    .ee-card__img img{ height: 150px; }
+  }
 </style>
 
 <script>
