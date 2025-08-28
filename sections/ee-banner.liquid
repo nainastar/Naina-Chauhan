@@ -184,12 +184,7 @@
     -webkit-line-clamp: unset;
     -webkit-box-orient: unset;
     }
-    /* Bottom strip: allow full wrapping and better sizing on small screens */
-    #ee-banner-{{ section.id }} .ee-banner__strip span{
-    white-space: normal;      /* allow wrapping */
-    word-break: break-word;   /* break long words if needed */
-    text-align: center;
-    }
+
 
   /* ---------- Mobile ---------- */
   @media (max-width: 768px){
@@ -232,9 +227,6 @@
     #ee-banner-{{ section.id }} .ee-banner__strip{ font-size:.7rem; padding:6px 8px; }
 
     #ee-banner-{{ section.id }} .ee-banner__subtitle{
-        font-size:.95rem;
-        max-width: 92%;
-        margin:0 auto .8rem;
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;   /* show only 2 lines */
