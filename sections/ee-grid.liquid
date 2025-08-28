@@ -273,12 +273,12 @@
   .ee-dd.open .ee-dd__caret-icon{ transform:rotate(180deg); }
 
   /* Hover/focus – black selectable area (both halves) */
-  .ee-dd__btn-text:hover,
+  {% comment %} .ee-dd__btn-text:hover,
   .ee-dd__btn-text:focus-visible,
   .ee-dd__btn-caret:hover,
   .ee-dd__btn-caret:focus-visible{
     background:#000; color:#fff; outline:none;
-  }
+  } {% endcomment %}
 
   /* Dropdown list (fade/slide handled via opacity/transform) */
   .ee-dd__list{
@@ -311,7 +311,7 @@
     width:100%; padding:.9rem 1.2rem; background:#000; color:#fff; border:none; cursor:pointer;
   }
   .ee-btn:hover{ background:#000; color:#fff; }
-  
+
     .ee-dd__caret-icon {
     display: inline-block;
     width: 8px;
