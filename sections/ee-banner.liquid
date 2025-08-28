@@ -135,6 +135,13 @@
     background:#eee; font-size:.78rem; padding:8px 12px; border-top:1px solid #ddd;
     letter-spacing:.06em;
   }
+    /* Right-align the CHOOSE GIFT button inside the grid */
+    #ee-banner-{{ section.id }} .ee-banner__topbar .ee-btn--top{
+        justify-self: end;   /* push to right edge of column */
+        width: max-content;  /* keep fitted to text */
+        white-space: nowrap; /* prevent wrapping */
+    }
+
 
   /* Mobile */
   @media (max-width: 768px){
@@ -152,19 +159,34 @@
   "tag": "section",
   "settings": [
     { "type": "text", "id": "brand_text", "label": "Brand (top-left)", "default": "TISSO VISION" },
-    { "type": "text", "id": "tagline", "label": "Top center tagline", "default": "Find the ideal gift for your loved ones." },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Top center tagline",
+      "default": "Find the ideal gift for your loved ones."
+    },
     { "type": "text", "id": "top_cta_text", "label": "Top right button text", "default": "CHOOSE GIFT" },
     { "type": "url", "id": "top_cta_link", "label": "Top right button link" },
 
     { "type": "text", "id": "title", "label": "Main Title", "default": "The Gift Guide" },
-    { "type": "textarea", "id": "subtitle", "label": "Subtitle paragraph", "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season." },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle paragraph",
+      "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season."
+    },
     { "type": "text", "id": "main_cta_text", "label": "Main CTA text", "default": "SHOP NOW" },
     { "type": "url", "id": "main_cta_link", "label": "Main CTA link" },
 
     { "type": "image_picker", "id": "bg_image", "label": "Background image (hero)" },
     { "type": "text", "id": "bg_alt", "label": "Background image alt", "default": "Gift guide background" },
 
-    { "type": "text", "id": "bottom_strip", "label": "Bottom strip text", "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL" }
+    {
+      "type": "text",
+      "id": "bottom_strip",
+      "label": "Bottom strip text",
+      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
+    }
   ],
   "presets": [{ "name": "EE • Banner" }]
 }
