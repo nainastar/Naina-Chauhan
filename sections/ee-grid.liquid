@@ -347,10 +347,78 @@
           block.innerHTML = `<label class="ee-label">${colorOpt.name}</label><br/>`;
           colorOpt.values.forEach((val) => {
             const pill = document.createElement('button');
+            // helper: map option text (or #hex) to a color
+            function colorToHex(str) {
+              if (!str) return '#000';
+              const s = String(str).trim().toLowerCase();
+              if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(s)) return s;
+              const map = {
+                black: '#000000',
+                white: '#ffffff',
+                blue: '#1e3a8a',
+                navy: '#001f3f',
+                'royal blue': '#4169e1',
+                'sky blue': '#87ceeb',
+                red: '#e11d48',
+                maroon: '#800000',
+                burgundy: '#800020',
+                green: '#16a34a',
+                'dark green': '#006400',
+                olive: '#6b8e23',
+                lime: '#32cd32',
+                teal: '#008080',
+                cyan: '#00ffff',
+                aqua: '#00ffff',
+                yellow: '#facc15',
+                gold: '#d4af37',
+                mustard: '#e1ad01',
+                orange: '#f97316',
+                coral: '#ff7f50',
+                peach: '#ffdab9',
+                purple: '#7e22ce',
+                violet: '#8a2be2',
+                lavender: '#e6e6fa',
+                magenta: '#ff00ff',
+                pink: '#ec4899',
+                'hot pink': '#ff69b4',
+                brown: '#8b4513',
+                tan: '#d2b48c',
+                khaki: '#c3b091',
+                beige: '#f5f5dc',
+                ivory: '#fffff0',
+                cream: '#fffdd0',
+                grey: '#808080',
+                gray: '#808080',
+                charcoal: '#36454f',
+                silver: '#c0c0c0',
+              };
+              return map[s] || '#000';
+            }
+
+            function isLight(hex) {
+              const c = hex.replace('#', '');
+              let r, g, b;
+              if (c.length === 3) {
+                r = parseInt(c[0] + c[0], 16);
+                g = parseInt(c[1] + c[1], 16);
+                b = parseInt(c[2] + c[2], 16);
+              } else {
+                r = parseInt(c.slice(0, 2), 16);
+                g = parseInt(c.slice(2, 4), 16);
+                b = parseInt(c.slice(4, 6), 16);
+              }
+              const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+              return yiq > 200;
+            }
+
             pill.type = 'button';
             pill.className = 'ee-pill';
             pill.textContent = val;
             pill.setAttribute('aria-pressed', 'false');
+            const hex = colorToHex(val);
+            pill.style.setProperty('--swatch', hex);
+            if (isLight(hex)) pill.setAttribute('data-swatch-light', 'true');
+
             pill.addEventListener('click', () => {
               block.querySelectorAll('.ee-pill').forEach((el) => el.setAttribute('aria-pressed', 'false'));
               pill.setAttribute('aria-pressed', 'true');
