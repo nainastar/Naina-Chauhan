@@ -127,16 +127,15 @@
 
             <!-- Right (caret) button -->
             <button
-                type="button"
-                class="ee-dd__btn-caret"
-                aria-label="Toggle size options"
-                aria-haspopup="listbox"
-                aria-expanded="false"
-                aria-controls="ee-dd-list-{{ section.id }}"
-                >
-                <span class="ee-dd__caret-icon"></span>
+              type="button"
+              class="ee-dd__btn-caret"
+              aria-label="Toggle size options"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-controls="ee-dd-list-{{ section.id }}"
+            >
+              <span class="ee-dd__caret-icon"></span>
             </button>
-
           </div>
 
           <ul
@@ -543,49 +542,58 @@
         })
       );
     }
-    // Refreshes cart count and (if present) the theme's cart drawer using Sections Rendering API.
-    // Works on Dawn-like themes and falls back to just updating the count.
-    // Call after any successful /cart/add.js call.
+
+    // Refreshes cart icon/drawer using Shopify Sections Rendering API + safe caching.
+    // Scans the DOM for common cart sections and only re-renders what exists.
     async function refreshCartUI({ openDrawer = true } = {}) {
       try {
-        // Always get latest cart (no cache)
+        // 1) Always fetch the latest cart JSON (send cookies; no cache)
         const cart = await (
-          await fetch('/cart.js', { cache: 'no-store', headers: { Accept: 'application/json' } })
+          await fetch('/cart.js?t=' + Date.now(), {
+            method: 'GET',
+            credentials: 'include',
+            cache: 'no-store',
+            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          })
         ).json();
 
-        // Update common cart-count targets (covers many themes)
+        // 2) Update any visible count bubbles
         const countTargets = document.querySelectorAll(
           '[data-cart-count], [data-cart-items-count], .cart-count-bubble .cart-count, .header__icon--cart .cart-count'
         );
         countTargets.forEach((el) => {
           el.textContent = cart.item_count;
-          // unhide bubbles if your theme hides them at 0
           el.closest('.cart-count-bubble')?.classList.toggle('hidden', cart.item_count === 0);
         });
 
-        // Try to re-render cart-related sections (Dawn & similar)
-        const sectionsToRender = ['cart-drawer', 'cart-icon-bubble'].filter((id) =>
-          document.getElementById(`shopify-section-${id}`)
-        );
+        // 3) Re-render cart-related sections that actually exist on the page
+        const candidateIds = [
+          'cart-drawer',
+          'cart-notification',
+          'cart-icon-bubble',
+          'main-cart-items', // Cart page
+        ];
+        const sectionsToRender = candidateIds.filter((id) => document.getElementById(`shopify-section-${id}`));
         if (sectionsToRender.length) {
-          const res = await fetch(`/?sections=${sectionsToRender.join(',')}`, {
-            headers: { 'Cache-Control': 'no-cache' },
+          const res = await fetch(`/?sections=${sectionsToRender.join(',')}&t=${Date.now()}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: { 'Cache-Control': 'no-cache', 'X-Requested-With': 'XMLHttpRequest' },
           });
-          const html = await res.json();
+          const htmlById = await res.json();
           sectionsToRender.forEach((id) => {
             const container = document.getElementById(`shopify-section-${id}`);
-            if (container && html[id]) container.innerHTML = html[id];
+            if (container && htmlById[id]) {
+              container.innerHTML = htmlById[id];
+            }
           });
         }
 
-        // Open cart drawer if the theme provides one (best-effort across themes)
+        // 4) Open a cart drawer/notification if your theme has one
         if (openDrawer) {
-          const drawer =
-            document.querySelector('cart-drawer') ||
-            document.getElementById('CartDrawer') ||
-            document.querySelector('.js-drawer-open-cart');
+          // Dawn drawer
+          const drawer = document.querySelector('cart-drawer') || document.getElementById('CartDrawer');
           if (drawer) {
-            // a few common open mechanisms:
             try {
               drawer.setAttribute?.('open', '');
             } catch {}
@@ -597,11 +605,18 @@
             } catch {}
             drawer.classList?.add('is-open');
           }
+          // Dawn "cart-notification" (fallback)
+          const notif = document.querySelector('cart-notification');
+          if (notif && typeof notif.renderContents === 'function') {
+            try {
+              notif.renderContents(cart);
+            } catch {}
+          }
         }
 
-        // Notify any theme listeners
-        window.dispatchEvent(new CustomEvent('cart:refresh', { detail: { cart } }));
+        // 5) Let any theme scripts listen for this
         document.dispatchEvent(new CustomEvent('cart:refresh', { detail: { cart } }));
+        window.dispatchEvent(new CustomEvent('cart:refresh', { detail: { cart } }));
       } catch (err) {
         console.error('Cart refresh failed:', err);
       }
@@ -622,7 +637,12 @@
         // Add main product
         await fetch('/cart/add.js', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
           body: JSON.stringify({ id: v.id, quantity: 1 }),
           cache: 'no-store',
         });
@@ -634,7 +654,12 @@
         if (/black/i.test(pickedColor) && /medium/i.test(pickedSize) && payload.autoAdd && payload.autoAdd.variant_id) {
           await fetch('/cart/add.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+            },
             body: JSON.stringify({ id: payload.autoAdd.variant_id, quantity: 1 }),
             cache: 'no-store',
           });
