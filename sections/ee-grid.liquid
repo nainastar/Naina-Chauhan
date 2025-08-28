@@ -127,15 +127,16 @@
 
             <!-- Right (caret) button -->
             <button
-              type="button"
-              class="ee-dd__btn-caret"
-              aria-label="Toggle size options"
-              aria-haspopup="listbox"
-              aria-expanded="false"
-              aria-controls="ee-dd-list-{{ section.id }}"
-            >
-              <span class="ee-dd__caret-icon"></span>
+                type="button"
+                class="ee-dd__btn-caret"
+                aria-label="Toggle size options"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+                aria-controls="ee-dd-list-{{ section.id }}"
+                >
+                <span class="ee-dd__caret-icon"></span>
             </button>
+
           </div>
 
           <ul
@@ -310,6 +311,16 @@
     width:100%; padding:.9rem 1.2rem; background:#000; color:#fff; border:none; cursor:pointer;
   }
   .ee-btn:hover{ background:#000; color:#fff; }
+  
+    .ee-dd__caret-icon {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-left: 2px solid black;
+    border-bottom: 2px solid black;
+    transform: rotate(-45deg);
+    margin-left: 6px;
+    }
 
   @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
     /* MOBILE: center heading, no left/right margin */
