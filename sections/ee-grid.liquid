@@ -1,10 +1,11 @@
 {% comment %}
-  EE • Product Grid (no jQuery)
-  - 6 product tiles (selectable in customizer)
-  - Click (+) to open modal with dynamic options/variants
-  - Add to cart via fetch('/cart/add.js')
-  - Bonus rule: if Color=Black AND Size=Medium → also add Soft Winter Jacket
+  EE • Product Grid (modal layout adjusted)
+  - Grid of 6 products selected in customizer
+  - Modal: top row = image | details ; bottom row (full width) = color, size, add to cart
+  - Custom size dropdown with slow fade and arrow rotate
+  - Add to cart via /cart/add.js (+ bonus auto-add)
 {% endcomment %}
+
 <section id="ee-grid-{{ section.id }}" class="ee-grid">
   <div class="ee-grid__head">
     <h2 class="ee-grid__title">{{ section.settings.heading }}</h2>
@@ -27,7 +28,7 @@
     {% endfor %}
   </div>
 
-  <!-- JSON payload -->
+  <!-- JSON payload for JS -->
   <script type="application/json" id="ee-grid-data-{{ section.id }}">
     {
       "products":[
@@ -77,6 +78,8 @@
   <!-- Modal -->
   <div class="ee-modal" aria-hidden="true">
     <div class="ee-modal__backdrop"></div>
+
+    <!-- Grid: [image | details] on row 1, full-width form on row 2 -->
     <div class="ee-modal__dialog" role="dialog" aria-modal="true" aria-label="Quick view">
       <button class="ee-modal__close" aria-label="Close">×</button>
 
@@ -90,93 +93,96 @@
         <h3 class="ee-modal__title"></h3>
         <div class="ee-modal__price"></div>
         <p class="ee-modal__desc"></p>
-
-        <form class="ee-form" novalidate>
-          <!-- Color pills injected here -->
-          <div class="ee-form__opts"></div>
-
-          <!-- Size dropdown only (no label) -->
-          <div class="ee-select">
-            <select name="size" aria-label="Size"></select>
-            <span class="ee-select__icon">▾</span>
-            <span class="ee-select__fade" aria-hidden="true"></span>
-          </div>
-
-          <button type="submit" class="ee-btn ee-btn--add">
-            <span>ADD TO CART</span>
-            <span class="ee-arrow" aria-hidden="true">→</span>
-          </button>
-          <p class="ee-form__msg" role="status" aria-live="polite"></p>
-        </form>
       </div>
+
+      <!-- row 2: full-width controls -->
+      <form class="ee-form" novalidate>
+        <div class="ee-form__opts"><!-- Color pills injected here --></div>
+
+        <!-- custom size dropdown -->
+        <div class="ee-dd" data-name="size">
+          <button type="button" class="ee-dd__btn" aria-haspopup="listbox" aria-expanded="false">
+            <span class="ee-dd__label">Choose your size</span>
+            <span class="ee-dd__icon">▾</span>
+          </button>
+          <ul class="ee-dd__list" role="listbox"></ul>
+        </div>
+
+        <button type="submit" class="ee-btn ee-btn--add">
+          <span>ADD TO CART</span>
+          <span class="ee-arrow" aria-hidden="true">→</span>
+        </button>
+        <p class="ee-form__msg" role="status" aria-live="polite"></p>
+      </form>
     </div>
   </div>
 </section>
 
 <style>
   #ee-grid-{{ section.id }}{ --gap:18px; --black:#111; --accent:#FCEB00; }
-  .ee-grid__wrap{ max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(3,1fr); gap:var(--gap);}
-  @media(max-width:990px){ .ee-grid__wrap{grid-template-columns:repeat(2,1fr);} }
-  @media(max-width:640px){ .ee-grid__wrap{grid-template-columns:1fr;} }
+  .ee-grid__head{ max-width:1200px; margin:0 auto 10px; padding:0 16px; }
+  .ee-grid__title{ font-size:clamp(22px,2.6vw,36px); margin:10px 0 20px; }
 
-  .ee-card{ position:relative; overflow:hidden; border-radius:6px;}
+  .ee-grid__wrap{ max-width:1200px; margin:0 auto; padding:0 16px; display:grid; grid-template-columns:repeat(3,1fr); gap:var(--gap); }
+  @media(max-width:990px){ .ee-grid__wrap{ grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:640px){ .ee-grid__wrap{ grid-template-columns:1fr; } }
+
+  .ee-card{ position:relative; overflow:hidden; border-radius:6px; }
   .ee-card__img img{ display:block; width:100%; height:100%; object-fit:cover; }
-  .ee-card__open{position:absolute; right:10px; top:10px; width:32px; height:32px; border-radius:50%; background:#fff; border:1px solid #d9d9d9; cursor:pointer;}
+  .ee-card__open{ position:absolute; right:10px; top:10px; width:32px; height:32px; border-radius:50%; background:#fff; border:1px solid #d9d9d9; cursor:pointer; }
 
-  /* Centered modal */
+  /* Center modal & layout */
   .ee-modal{ position:fixed; inset:0; display:none; z-index:100; justify-content:center; align-items:center; }
   .ee-modal[aria-hidden="false"]{ display:flex; }
   .ee-modal__backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.45); animation:fadeIn .3s ease; }
-  /* side-by-side layout: image left (120px) + body right */
   .ee-modal__dialog{
-    position:relative; z-index:2; background:#fff; width:420px;
-    display:grid; grid-template-columns:120px 1fr; gap:14px;
+    position:relative; z-index:2; background:#fff; width:460px;
+    display:grid; grid-template-columns:130px 1fr; grid-template-rows:auto auto;
+    grid-template-areas:
+      "media body"
+      "form  form";
+    column-gap:14px; row-gap:10px;
     border-radius:6px; padding:16px; animation:fadeIn .35s ease;
   }
   .ee-modal__close{ position:absolute; right:10px; top:6px; background:none; border:none; font-size:22px; cursor:pointer; }
 
-  .ee-modal__media{ grid-column:1/2; }
+  .ee-modal__media{ grid-area:media; }
   .ee-modal__img{ width:100%; height:120px; object-fit:cover; border:1px solid #eee; }
 
-  .ee-modal__body{ grid-column:2/3; }
+  .ee-modal__body{ grid-area:body; }
   .ee-modal__title{ font-size:18px; margin:2px 0 4px; }
   .ee-modal__price{ font-weight:700; margin-bottom:6px; }
   .ee-modal__desc{ font-size:14px; color:#444; margin:0 0 10px; max-width:260px; }
 
-  /* Color option block (column) */
-  .ee-form__opts{ display:flex; flex-direction:column; gap:8px; margin-bottom:8px; }
+  .ee-form{ grid-area:form; display:block; margin-top:2px; }
+  .ee-form__opts{ display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
   .ee-label{ font-size:13px; color:#333; margin:6px 0 2px; }
-  .ee-pill{
-    border:1px solid #ccc; padding:10px 12px; text-align:left; cursor:pointer;
-    background:#fff; transition:background .25s ease, color .25s ease, border-color .25s ease;
-  }
+  .ee-pill{ border:1px solid #ccc; padding:10px 12px; text-align:left; cursor:pointer; background:#fff; transition:background .25s ease, color .25s ease, border-color .25s ease; }
   .ee-pill[aria-pressed="true"]{ background:#000; color:#fff; border-color:#000; }
 
-  /* Size dropdown (no label), with slow fade + slow arrow rotate */
-  .ee-select{ position:relative; margin:8px 0 14px; }
-  .ee-select select{
-    appearance:none; width:100%; padding:10px 40px 10px 12px;
-    border:1px solid #ccc; background:#fff; cursor:pointer;
+  /* Custom dropdown */
+  .ee-dd{ position:relative; margin:6px 0 14px; }
+  .ee-dd__btn{
+    width:100%; display:flex; justify-content:space-between; align-items:center;
+    padding:10px 12px; border:1px solid #ccc; background:#fff; cursor:pointer;
   }
-  .ee-select__icon{
-    position:absolute; right:12px; top:50%; transform:translateY(-50%);
-    transition:transform .6s ease; pointer-events:none;
+  .ee-dd__icon{ transition:transform .6s ease; }
+  .ee-dd.open .ee-dd__icon{ transform:rotate(180deg); }
+  .ee-dd__list{
+    position:absolute; left:-1px; right:-1px; top:calc(100% + 2px); max-height:220px; overflow:auto;
+    border:1px solid #000; background:#fff; opacity:0; transform:translateY(-6px);
+    pointer-events:none; transition:opacity .6s ease, transform .6s ease;
   }
-  .ee-select.open .ee-select__icon{ transform:translateY(-50%) rotate(180deg); }
+  .ee-dd.open .ee-dd__list{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .ee-dd__list li{ padding:12px; cursor:pointer; }
+  .ee-dd__list li:hover{ background:#000; color:#fff; }
 
-  /* purely decorative fade plate */
-  .ee-select__fade{
-    content:""; position:absolute; left:0; right:0; top:100%; height:10px;
-    background:#fff; opacity:0; transition:opacity .6s ease;
-  }
-  .ee-select.open .ee-select__fade{ opacity:1; }
-
-  /* Add to cart: solid black, no color change on hover */
+  /* Add to cart: keep black on hover */
   .ee-btn{
     display:inline-flex; justify-content:center; align-items:center; gap:.5rem;
     width:100%; padding:.9rem 1.2rem; background:#000; color:#fff; border:none; cursor:pointer;
   }
-  .ee-btn:hover{ background:#000; color:#fff; } /* no change */
+  .ee-btn:hover{ background:#000; color:#fff; }
 
   @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
 </style>
@@ -186,98 +192,116 @@
   const root = document.getElementById('ee-grid-{{ section.id }}');
   if (!root) return;
 
-  const data = JSON.parse(document.getElementById('ee-grid-data-{{ section.id }}').textContent);
-  const modal = root.querySelector('.ee-modal');
-  const backdrop = modal.querySelector('.ee-modal__backdrop');
-  const closeBtn = modal.querySelector('.ee-modal__close');
+  const payload = JSON.parse(document.getElementById('ee-grid-data-{{ section.id }}').textContent);
+  const modal   = root.querySelector('.ee-modal');
+  const dialog  = modal.querySelector('.ee-modal__dialog');
+  const backdrop= modal.querySelector('.ee-modal__backdrop');
+  const closeBtn= modal.querySelector('.ee-modal__close');
 
   const imgEl   = modal.querySelector('.ee-modal__img');
   const titleEl = modal.querySelector('.ee-modal__title');
   const priceEl = modal.querySelector('.ee-modal__price');
   const descEl  = modal.querySelector('.ee-modal__desc');
 
-  const optsEl  = modal.querySelector('.ee-form__opts');
-  const sizeSel = modal.querySelector('select[name="size"]');
-  const selectWrap = sizeSel.closest('.ee-select');
-
-  const form   = modal.querySelector('.ee-form');
-  const msgEl  = modal.querySelector('.ee-form__msg');
+  const form    = modal.querySelector('.ee-form');
+  const colorWrap = modal.querySelector('.ee-form__opts');
+  const dd      = modal.querySelector('.ee-dd');
+  const ddBtn   = dd.querySelector('.ee-dd__btn');
+  const ddLabel = dd.querySelector('.ee-dd__label');
+  const ddList  = dd.querySelector('.ee-dd__list');
+  const msgEl   = modal.querySelector('.ee-form__msg');
 
   let activeProduct = null;
   let chosen = {};
+  let selectedSize = "";
 
-  const open = () => { modal.setAttribute('aria-hidden','false'); document.documentElement.style.overflow='hidden'; };
-  const close = () => { modal.setAttribute('aria-hidden','true'); document.documentElement.style.overflow=''; msgEl.textContent=''; };
+  const open  = () => { modal.setAttribute('aria-hidden','false'); document.documentElement.style.overflow='hidden'; };
+  const close = () => { modal.setAttribute('aria-hidden','true'); document.documentElement.style.overflow=''; msgEl.textContent=''; dd.classList.remove('open'); };
 
   closeBtn.addEventListener('click', close);
   backdrop.addEventListener('click', close);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 
-  // slow "dropdown open" visuals
-  sizeSel.addEventListener('focus', () => selectWrap.classList.add('open'));
-  sizeSel.addEventListener('blur',  () => selectWrap.classList.remove('open'));
+  // custom dropdown open/close
+  ddBtn.addEventListener('click', () => {
+    const openState = dd.classList.toggle('open');
+    ddBtn.setAttribute('aria-expanded', openState ? 'true' : 'false');
+  });
+  document.addEventListener('click', (e) => {
+    if (!dialog.contains(e.target)) dd.classList.remove('open');
+  });
 
-  // open product
+  // open modal for product
   root.querySelectorAll('.ee-card__open').forEach(btn => {
     btn.addEventListener('click', () => {
       const handle = btn.closest('.ee-card').dataset.handle;
-      const product = data.products.find(p => p.handle === handle);
-      if (!product) return;
+      const p = payload.products.find(x => x.handle === handle);
+      if (!p) return;
 
-      activeProduct = product;
+      activeProduct = p;
       chosen = {};
+      selectedSize = "";
 
-      imgEl.src = product.featured_image || '';
-      imgEl.alt = product.title;
-      titleEl.textContent = product.title;
-      priceEl.textContent = product.price_formatted;
-      descEl.textContent  = product.description;
+      imgEl.src = p.featured_image || '';
+      imgEl.alt = p.title || '';
+      titleEl.textContent = p.title || '';
+      priceEl.textContent = p.price_formatted || '';
+      descEl.textContent  = p.description || '';
 
-      // COLOR option — find by name (case-insensitive)
-      const colorOpt = product.options.find(o => /color/i.test(o.name)) || product.options[0];
-      optsEl.innerHTML = '';
+      // build color pills (find color option by name)
+      colorWrap.innerHTML = '';
+      const colorOpt = p.options.find(o => /color/i.test(o.name));
       if (colorOpt) {
-        const wrap = document.createElement('div');
-        wrap.innerHTML = `<label class="ee-label">${colorOpt.name}</label>`;
+        const block = document.createElement('div');
+        block.innerHTML = `<label class="ee-label">${colorOpt.name}</label>`;
         colorOpt.values.forEach(val => {
           const pill = document.createElement('button');
-          pill.type = 'button';
-          pill.className = 'ee-pill';
-          pill.textContent = val;
-          pill.setAttribute('aria-pressed','false');
+          pill.type='button'; pill.className='ee-pill'; pill.textContent=val; pill.setAttribute('aria-pressed','false');
           pill.addEventListener('click', () => {
-            wrap.querySelectorAll('.ee-pill').forEach(p => p.setAttribute('aria-pressed','false'));
+            block.querySelectorAll('.ee-pill').forEach(el => el.setAttribute('aria-pressed','false'));
             pill.setAttribute('aria-pressed','true');
             chosen[colorOpt.name] = val;
           });
-          wrap.appendChild(pill);
+          block.appendChild(pill);
         });
-        optsEl.appendChild(wrap);
+        colorWrap.appendChild(block);
       }
 
-      // SIZE dropdown — find by name (case-insensitive)
-      const sizeOpt = product.options.find(o => /size/i.test(o.name));
+      // build size dropdown values slowly fading list (handled by CSS)
+      const sizeOpt = p.options.find(o => /size/i.test(o.name));
       let sizes = [];
-      if (sizeOpt && sizeOpt.values) {
-        sizes = sizeOpt.values;
-      } else {
-        // fallback: unique across variants (2nd option typical)
-        const idx = product.options.findIndex(o => /size/i.test(o.name));
-        const set = new Set(product.variants.map(v => v.options[idx >= 0 ? idx : 1]).filter(Boolean));
-        sizes = [...set];
+      if (sizeOpt) sizes = sizeOpt.values;
+      else {
+        // fallback unique values for second option if no explicit "Size"
+        const idx = p.options.length > 1 ? 1 : 0;
+        sizes = [...new Set(p.variants.map(v => v.options[idx]).filter(Boolean))];
       }
-      sizeSel.innerHTML = '<option value="" selected>Choose your size</option>' + sizes.map(s => `<option>${s}</option>`).join('');
+      ddList.innerHTML = '';
+      sizes.forEach(v => {
+        const li = document.createElement('li');
+        li.textContent = v;
+        li.setAttribute('role','option');
+        li.addEventListener('click', () => {
+          selectedSize = v;
+          ddLabel.textContent = v;
+          dd.classList.remove('open');
+        });
+        ddList.appendChild(li);
+      });
+      // reset label
+      ddLabel.textContent = 'Choose your size';
 
       open();
     });
   });
 
-  // find variant that matches chosen selections
   function findVariant() {
     if (!activeProduct) return null;
     return activeProduct.variants.find(v =>
       activeProduct.options.every((opt, i) => {
-        const want = chosen[opt.name] || ( /size/i.test(opt.name) ? sizeSel.value : null );
+        const want =
+          /size/i.test(opt.name) ? selectedSize :
+          (chosen[opt.name] || null);
         return !want || v.options[i] === want;
       })
     );
@@ -287,22 +311,19 @@
     e.preventDefault();
     msgEl.textContent = '';
 
-    const variant = findVariant();
-    if (!variant) { msgEl.textContent = 'Please select options.'; return; }
+    const v = findVariant();
+    if (!v) { msgEl.textContent = 'Please select options.'; return; }
 
-    // add main product
     await fetch('/cart/add.js', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: variant.id, quantity: 1 })
+      body: JSON.stringify({ id: v.id, quantity: 1 })
     });
 
-    // bonus auto-add (Black + Medium)
+    // bonus: auto add when Color=Black & Size=Medium
     const colorName = (activeProduct.options.find(o=>/color/i.test(o.name))||{}).name;
-    const sizeName  = (activeProduct.options.find(o=>/size/i.test(o.name))||{}).name;
     const pickedColor = colorName ? (chosen[colorName] || '') : '';
-    const pickedSize  = sizeName  ? (chosen[sizeName]  || sizeSel.value || '') : '';
+    const pickedSize  = selectedSize || '';
 
-    const payload = JSON.parse(document.getElementById('ee-grid-data-{{ section.id }}').textContent);
     if (/black/i.test(pickedColor) && /medium/i.test(pickedSize) && payload.autoAdd && payload.autoAdd.variant_id) {
       await fetch('/cart/add.js', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -328,9 +349,8 @@
     { "type": "product", "id": "product_5", "label": "Product #5" },
     { "type": "product", "id": "product_6", "label": "Product #6" },
     { "type": "header", "content": "Bonus auto-add rule" },
-    { "type": "product", "id": "bonus_product", "label": "Soft Winter Jacket" }
+    { "type": "product", "id": "bonus_product", "label": "Soft Winter Jacket (auto add when Color=Black & Size=Medium)" }
   ],
   "presets": [{ "name": "EE • Product Grid" }]
 }
 {% endschema %}
-
