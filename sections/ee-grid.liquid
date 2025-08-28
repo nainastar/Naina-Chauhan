@@ -166,6 +166,7 @@
 
   .ee-grid__wrap{ max-width:1200px; margin:0 auto; padding:0; display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }
   @media(max-width:990px){ .ee-grid__wrap{ grid-template-columns:repeat(2,1fr); } }
+  /* MOBILE: 2 columns */
   @media(max-width:640px){ .ee-grid__wrap{ grid-template-columns:repeat(2,1fr); } }
 
   .ee-card{ position:relative; overflow:hidden; }
@@ -214,7 +215,7 @@
     transition:background .25s ease, color .25s ease, border-color .25s ease;
     position: relative;
     overflow: hidden;
-    padding-left: 22px;
+    padding-left: 22px; /* space for color rail */
   }
   .ee-pill::before{
     content: "";
@@ -230,56 +231,98 @@
      UPDATED Size dropdown (split trigger + centered text)
   --------------------------------------------- */
   .ee-dd{ position:relative; margin:6px 0 14px; }
-  .ee-dd__field-label{ display:block; font-size:13px; color:#333; margin:6px 0 6px; }
 
+  /* Label above dropdown */
+  .ee-dd__field-label{
+    display:block; font-size:13px; color:#333; margin:6px 0 6px;
+  }
+
+  /* Split control wrapper: 1) text area  2) caret box */
   .ee-dd__control{
     display:grid;
-    grid-template-columns: 1fr 48px;
+    grid-template-columns: 1fr 48px; /* text + caret */
     border:1px solid #ccc;
     background:#fff;
   }
+
+  /* Shared button base */
   .ee-dd__btn-text,
   .ee-dd__btn-caret{
-    height:50px; background:#fff; border:0; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
+    height:50px;
+    background:#fff;
+    border:0;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;  /* centers label/caret */
     transition: background .25s ease, color .25s ease, border-color .25s ease;
   }
+
+  /* Text side */
   .ee-dd__btn-text{ padding:0 12px; }
-  .ee-dd__label{ width:100%; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ee-dd__label{
+    width:100%;
+    text-align:center;       /* selected size centered */
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+
+  /* Caret side */
   .ee-dd__btn-caret{ border-left:1px solid #ccc; }
   .ee-dd__caret-icon{ transition:transform .6s ease; }
   .ee-dd.open .ee-dd__caret-icon{ transform:rotate(135deg); }
 
+  /* Hover/focus – black selectable area (both halves) */
+  {% comment %} .ee-dd__btn-text:hover,
+  .ee-dd__btn-text:focus-visible,
+  .ee-dd__btn-caret:hover,
+  .ee-dd__btn-caret:focus-visible{
+    background:#000; color:#fff; outline:none;
+  } {% endcomment %}
+
+  /* Dropdown list (fade/slide handled via opacity/transform) */
   .ee-dd__list{
     position:absolute; left:-1px; right:-1px; top:calc(100% + 2px);
     max-height:220px; overflow:auto;
     border:1px solid #000; background:#fff;
     opacity:0; transform:translateY(-6px);
     pointer-events:none; transition:opacity .6s ease, transform .6s ease;
+
+    /* bullets removed and spacing reset */
     list-style:none; margin:0; padding:0;
   }
   .ee-dd.open .ee-dd__list{ opacity:1; transform:translateY(0); pointer-events:auto; }
+
+  /* Each option ~50px tall, centered text + black hover */
   .ee-dd__list li{
-    list-style:none; display:flex; align-items:center; justify-content:center;
+    list-style:none;
+    display:flex; align-items:center; justify-content:center;
     min-height:31px; padding:0 12px; cursor:pointer;
     transition: background .2s ease, color .2s ease;
   }
-  .ee-dd__list li:hover, .ee-dd__list li:focus{ background:#000; color:#fff; }
+  .ee-dd__list li:hover,
+  .ee-dd__list li:focus{ background:#000; color:#fff; }
 
-  /* CTA */
+  /* ---------------------------------------------
+     CTA button
+  --------------------------------------------- */
   .ee-btn{
     display:inline-flex; justify-content:center; align-items:center; gap:.5rem;
     width:100%; padding:.9rem 1.2rem; background:#000; color:#fff; border:none; cursor:pointer;
   }
   .ee-btn:hover{ background:#000; color:#fff; }
 
-  .ee-dd__caret-icon {
-    display:inline-block; width:8px; height:8px;
-    border-left:2px solid black; border-bottom:2px solid black;
-    transform: rotate(-45deg); margin-left:6px;
-  }
+    .ee-dd__caret-icon {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-left: 2px solid black;
+        border-bottom: 2px solid black;
+        transform: rotate(-45deg);
+        margin-left: 6px;
+    }
 
   @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+    /* MOBILE: center heading, no left/right margin */
   @media(max-width:640px){
     .ee-grid__head{ margin: 0 0 24px 0; padding: 0; max-width: 100%; }
     .ee-grid__title{ text-align: center; margin-left: 0; margin-right: 0; }
@@ -306,11 +349,11 @@
     const form = modal.querySelector('.ee-form');
     const colorWrap = modal.querySelector('.ee-form__opts');
 
-    /* Split size dropdown refs */
+    /* UPDATED: split size dropdown refs */
     const dd = modal.querySelector('.ee-dd');
-    const ddBtns = dd.querySelectorAll('.ee-dd__btn-text, .ee-dd__btn-caret');
+    const ddBtns = dd.querySelectorAll('.ee-dd__btn-text, .ee-dd__btn-caret'); // both halves
     const ddLabel = dd.querySelector('.ee-dd__label');
-    const ddList  = dd.querySelector('.ee-dd__list');
+    const ddList = dd.querySelector('.ee-dd__list');
 
     const msgEl = modal.querySelector('.ee-form__msg');
 
@@ -318,56 +361,117 @@
     let chosen = {};
     let selectedSize = '';
 
-    /* Helpers for color rail */
-    function colorToHex(str){
+    /* ---- Helpers for color swatch rail ---- */
+    function colorToHex(str) {
       if (!str) return '#000';
       const s = String(str).trim().toLowerCase();
       if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(s)) return s;
-      const map = { black:'#000000', white:'#ffffff', blue:'#1e3a8a', navy:'#001f3f', 'royal blue':'#4169e1',
-        'sky blue':'#87ceeb', red:'#e11d48', maroon:'#800000', burgundy:'#800020', green:'#16a34a',
-        'dark green':'#006400', olive:'#6b8e23', lime:'#32cd32', teal:'#008080', cyan:'#00ffff',
-        aqua:'#00ffff', yellow:'#facc15', gold:'#d4af37', mustard:'#e1ad01', orange:'#f97316',
-        coral:'#ff7f50', peach:'#ffdab9', purple:'#7e22ce', violet:'#8a2be2', lavender:'#e6e6fa',
-        magenta:'#ff00ff', pink:'#ec4899', 'hot pink':'#ff69b4', brown:'#8b4513', tan:'#d2b48c',
-        khaki:'#c3b091', beige:'#f5f5dc', ivory:'#fffff0', cream:'#fffdd0', grey:'#808080',
-        gray:'#808080', charcoal:'#36454f', silver:'#c0c0c0' };
+      const map = {
+        black: '#000000',
+        white: '#ffffff',
+        blue: '#1e3a8a',
+        navy: '#001f3f',
+        'royal blue': '#4169e1',
+        'sky blue': '#87ceeb',
+        red: '#e11d48',
+        maroon: '#800000',
+        burgundy: '#800020',
+        green: '#16a34a',
+        'dark green': '#006400',
+        olive: '#6b8e23',
+        lime: '#32cd32',
+        teal: '#008080',
+        cyan: '#00ffff',
+        aqua: '#00ffff',
+        yellow: '#facc15',
+        gold: '#d4af37',
+        mustard: '#e1ad01',
+        orange: '#f97316',
+        coral: '#ff7f50',
+        peach: '#ffdab9',
+        purple: '#7e22ce',
+        violet: '#8a2be2',
+        lavender: '#e6e6fa',
+        magenta: '#ff00ff',
+        pink: '#ec4899',
+        'hot pink': '#ff69b4',
+        brown: '#8b4513',
+        tan: '#d2b48c',
+        khaki: '#c3b091',
+        beige: '#f5f5dc',
+        ivory: '#fffff0',
+        cream: '#fffdd0',
+        grey: '#808080',
+        gray: '#808080',
+        charcoal: '#36454f',
+        silver: '#c0c0c0',
+      };
       return map[s] || '#000';
     }
-    function isLight(hex){
-      const c = hex.replace('#',''); let r,g,b;
-      if (c.length===3){ r=parseInt(c[0]+c[0],16); g=parseInt(c[1]+c[1],16); b=parseInt(c[2]+c[2],16); }
-      else { r=parseInt(c.slice(0,2),16); g=parseInt(c.slice(2,4),16); b=parseInt(c.slice(4,6),16); }
-      const yiq=(r*299+g*587+b*114)/1000; return yiq>200;
+    function isLight(hex) {
+      const c = hex.replace('#', '');
+      let r, g, b;
+      if (c.length === 3) {
+        r = parseInt(c[0] + c[0], 16);
+        g = parseInt(c[1] + c[1], 16);
+        b = parseInt(c[2] + c[2], 16);
+      } else {
+        r = parseInt(c.slice(0, 2), 16);
+        g = parseInt(c.slice(2, 4), 16);
+        b = parseInt(c.slice(4, 6), 16);
+      }
+      const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+      return yiq > 200;
     }
 
-    /* Modal open/close */
-    const open = () => { modal.setAttribute('aria-hidden', 'false'); document.documentElement.style.overflow = 'hidden'; };
-    const close = () => {
-      modal.setAttribute('aria-hidden', 'true'); document.documentElement.style.overflow = '';
-      msgEl.textContent = ''; dd.classList.remove('open'); ddBtns.forEach(b => b.setAttribute('aria-expanded','false'));
+    /* ---- Modal open/close ---- */
+    const open = () => {
+      modal.setAttribute('aria-hidden', 'false');
+      document.documentElement.style.overflow = 'hidden';
     };
+    const close = () => {
+      modal.setAttribute('aria-hidden', 'true');
+      document.documentElement.style.overflow = '';
+      msgEl.textContent = '';
+      dd.classList.remove('open');
+      ddBtns.forEach((b) => b.setAttribute('aria-expanded', 'false'));
+    };
+
     closeBtn.addEventListener('click', close);
     backdrop.addEventListener('click', close);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
-
-    /* Dropdown toggle */
-    ddBtns.forEach(btn => btn.addEventListener('click', () => {
-      const openState = dd.classList.toggle('open');
-      ddBtns.forEach(b => b.setAttribute('aria-expanded', openState ? 'true' : 'false'));
-    }));
-    document.addEventListener('click', (e) => {
-      if (!dialog.contains(e.target)) { dd.classList.remove('open'); ddBtns.forEach(b => b.setAttribute('aria-expanded','false')); }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
     });
 
-    /* Open modal with product data */
+    /* ---- Dropdown open/close (either half toggles) ---- */
+    ddBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const openState = dd.classList.toggle('open');
+        ddBtns.forEach((b) => b.setAttribute('aria-expanded', openState ? 'true' : 'false'));
+      });
+    });
+    document.addEventListener('click', (e) => {
+      if (!dialog.contains(e.target)) {
+        dd.classList.remove('open');
+        ddBtns.forEach((b) => b.setAttribute('aria-expanded', 'false'));
+      }
+    });
+
+    /* ---- Open modal for product ---- */
     root.querySelectorAll('.ee-card__open').forEach((btn) => {
       btn.addEventListener('click', () => {
         const handle = btn.closest('.ee-card').dataset.handle;
-        const p = payload.products.find((x) => x.handle === handle); if (!p) return;
-        activeProduct = p; chosen = {}; selectedSize = '';
+        const p = payload.products.find((x) => x.handle === handle);
+        if (!p) return;
 
-        imgEl.src = p.featured_image || ''; imgEl.alt = p.title || '';
-        titleEl.textContent = p.title || ''; priceEl.textContent = p.price_formatted || '';
+        activeProduct = p;
+        chosen = {};
+        selectedSize = '';
+
+        imgEl.src = p.featured_image || '';
+        imgEl.alt = p.title || '';
+        titleEl.textContent = p.title || '';
+        priceEl.textContent = p.price_formatted || '';
         descEl.textContent = p.description || '';
 
         /* Build color pills */
@@ -378,40 +482,57 @@
           block.innerHTML = `<label class="ee-label">${colorOpt.name}</label><br/>`;
           colorOpt.values.forEach((val) => {
             const pill = document.createElement('button');
-            pill.type = 'button'; pill.className = 'ee-pill'; pill.textContent = val; pill.setAttribute('aria-pressed','false');
-            const hex = colorToHex(val); pill.style.setProperty('--swatch', hex); if (isLight(hex)) pill.setAttribute('data-swatch-light','true');
+            pill.type = 'button';
+            pill.className = 'ee-pill';
+            pill.textContent = val;
+            pill.setAttribute('aria-pressed', 'false');
+
+            /* set swatch rail color */
+            const hex = colorToHex(val);
+            pill.style.setProperty('--swatch', hex);
+            if (isLight(hex)) pill.setAttribute('data-swatch-light', 'true');
+
             pill.addEventListener('click', () => {
-              block.querySelectorAll('.ee-pill').forEach((el) => el.setAttribute('aria-pressed','false'));
-              pill.setAttribute('aria-pressed','true'); chosen[colorOpt.name] = val;
+              block.querySelectorAll('.ee-pill').forEach((el) => el.setAttribute('aria-pressed', 'false'));
+              pill.setAttribute('aria-pressed', 'true');
+              chosen[colorOpt.name] = val;
             });
             block.appendChild(pill);
           });
           colorWrap.appendChild(block);
         }
 
-        /* Build size list */
+        /* Build size dropdown values */
         const sizeOpt = p.options.find((o) => /size/i.test(o.name));
         let sizes = [];
         if (sizeOpt) sizes = sizeOpt.values;
         else {
+          /* fallback: unique values for second option if no explicit "Size" */
           const idx = p.options.length > 1 ? 1 : 0;
           sizes = [...new Set(p.variants.map((v) => v.options[idx]).filter(Boolean))];
         }
         ddList.innerHTML = '';
         sizes.forEach((v) => {
           const li = document.createElement('li');
-          li.textContent = v; li.setAttribute('role','option');
+          li.textContent = v;
+          li.setAttribute('role', 'option');
           li.addEventListener('click', () => {
-            selectedSize = v; ddLabel.textContent = v;
-            dd.classList.remove('open'); ddBtns.forEach(b => b.setAttribute('aria-expanded','false'));
+            selectedSize = v;
+            ddLabel.textContent = v; // centered in trigger
+            dd.classList.remove('open');
+            ddBtns.forEach((b) => b.setAttribute('aria-expanded', 'false'));
           });
           ddList.appendChild(li);
         });
+
+        /* reset label */
         ddLabel.textContent = 'Choose your size';
+
         open();
       });
     });
 
+    /* ---- Variant finder ---- */
     function findVariant() {
       if (!activeProduct) return null;
       return activeProduct.variants.find((v) =>
@@ -422,32 +543,21 @@
       );
     }
 
-    /* --- Robust cart UI refresh & open helpers --- */
-    async function rerenderCartSections() {
-      const ids = ['cart-drawer','cart-notification','cart-icon-bubble','main-cart-items'].filter(id =>
-        document.getElementById(`shopify-section-${id}`)
-      );
-      if (!ids.length) return;
-      const res = await fetch(`/?sections=${ids.join(',')}&t=${Date.now()}`, {
-        method: 'GET', credentials: 'include',
-        headers: { 'Cache-Control': 'no-cache', 'X-Requested-With': 'XMLHttpRequest' }
-      });
-      const htmlById = await res.json();
-      ids.forEach((id) => {
-        const container = document.getElementById(`shopify-section-${id}`);
-        if (container && htmlById[id]) container.innerHTML = htmlById[id];
-      });
-    }
-
+    // Refreshes cart icon/drawer using Shopify Sections Rendering API + safe caching.
+    // Scans the DOM for common cart sections and only re-renders what exists.
     async function refreshCartUI({ openDrawer = true } = {}) {
       try {
-        // Fetch latest cart
-        const cart = await (await fetch('/cart.js?t=' + Date.now(), {
-          method:'GET', credentials:'include', cache:'no-store',
-          headers:{ 'Accept':'application/json','X-Requested-With':'XMLHttpRequest' }
-        })).json();
+        // 1) Always fetch the latest cart JSON (send cookies; no cache)
+        const cart = await (
+          await fetch('/cart.js?t=' + Date.now(), {
+            method: 'GET',
+            credentials: 'include',
+            cache: 'no-store',
+            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          })
+        ).json();
 
-        // Update count bubbles
+        // 2) Update any visible count bubbles
         const countTargets = document.querySelectorAll(
           '[data-cart-count], [data-cart-items-count], .cart-count-bubble .cart-count, .header__icon--cart .cart-count'
         );
@@ -456,27 +566,60 @@
           el.closest('.cart-count-bubble')?.classList.toggle('hidden', cart.item_count === 0);
         });
 
-        // Re-render known cart sections
-        await rerenderCartSections();
+        // 3) Re-render cart-related sections that actually exist on the page
+        const candidateIds = [
+          'cart-drawer',
+          'cart-notification',
+          'cart-icon-bubble',
+          'main-cart-items', // Cart page
+        ];
+        const sectionsToRender = candidateIds.filter((id) => document.getElementById(`shopify-section-${id}`));
+        if (sectionsToRender.length) {
+          const res = await fetch(`/?sections=${sectionsToRender.join(',')}&t=${Date.now()}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: { 'Cache-Control': 'no-cache', 'X-Requested-With': 'XMLHttpRequest' },
+          });
+          const htmlById = await res.json();
+          sectionsToRender.forEach((id) => {
+            const container = document.getElementById(`shopify-section-${id}`);
+            if (container && htmlById[id]) {
+              container.innerHTML = htmlById[id];
+            }
+          });
+        }
 
-        // Open drawer / notification if present
+        // 4) Open a cart drawer/notification if your theme has one
         if (openDrawer) {
+          // Dawn drawer
           const drawer = document.querySelector('cart-drawer') || document.getElementById('CartDrawer');
-          const notif  = document.querySelector('cart-notification');
           if (drawer) {
-            try { drawer.setAttribute?.('open',''); } catch {}
-            try { drawer.open = true; } catch {}
-            try { typeof drawer.openDrawer === 'function' && drawer.openDrawer(); } catch {}
+            try {
+              drawer.setAttribute?.('open', '');
+            } catch {}
+            try {
+              drawer.open = true;
+            } catch {}
+            try {
+              typeof drawer.openDrawer === 'function' && drawer.openDrawer();
+            } catch {}
             drawer.classList?.add('is-open');
-          } else if (notif) {
-            try { notif.classList.add('active'); } catch {}
-            try { typeof notif.renderContents === 'function' && notif.renderContents(cart); } catch {}
+          }
+          // Dawn "cart-notification" (fallback)
+          const notif = document.querySelector('cart-notification');
+          if (notif && typeof notif.renderContents === 'function') {
+            try {
+              notif.renderContents(cart);
+            } catch {}
           }
         }
 
+        // 5) Let any theme scripts listen for this
         document.dispatchEvent(new CustomEvent('cart:refresh', { detail: { cart } }));
         window.dispatchEvent(new CustomEvent('cart:refresh', { detail: { cart } }));
-      } catch (e) { console.error('Cart refresh failed', e); }
+      } catch (err) {
+        console.error('Cart refresh failed:', err);
+      }
     }
 
     /* ---- Add to cart ---- */
@@ -485,45 +628,44 @@
       msgEl.textContent = '';
 
       const v = findVariant();
-      if (!v) { msgEl.textContent = 'Please select options.'; return; }
+      if (!v) {
+        msgEl.textContent = 'Please select options.';
+        return;
+      }
 
       try {
         // Add main product
-        const res1 = await fetch('/cart/add.js', {
+        await fetch('/cart/add.js', {
           method: 'POST',
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
+            Accept: 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
-            'Cache-Control': 'no-cache'
           },
           body: JSON.stringify({ id: v.id, quantity: 1 }),
-          cache: 'no-store'
+          cache: 'no-store',
         });
-        if (!res1.ok) throw new Error('Add to cart failed');
 
-        // Bonus add (optional)
+        // Bonus auto-add when Color=Black & Size=Medium
         const colorName = (activeProduct.options.find((o) => /color/i.test(o.name)) || {}).name;
         const pickedColor = colorName ? chosen[colorName] || '' : '';
-        const pickedSize  = selectedSize || '';
+        const pickedSize = selectedSize || '';
         if (/black/i.test(pickedColor) && /M/i.test(pickedSize) && payload.autoAdd && payload.autoAdd.variant_id) {
-          const res2 = await fetch('/cart/add.js', {
+          await fetch('/cart/add.js', {
             method: 'POST',
             credentials: 'include',
             headers: {
               'Content-Type': 'application/json',
-              'Accept': 'application/json',
+              Accept: 'application/json',
               'X-Requested-With': 'XMLHttpRequest',
-              'Cache-Control': 'no-cache'
             },
             body: JSON.stringify({ id: payload.autoAdd.variant_id, quantity: 1 }),
-            cache: 'no-store'
+            cache: 'no-store',
           });
-          if (!res2.ok) console.warn('Bonus add failed');
         }
 
-        // Re-render cart UI and open drawer/notification
+        // 🔁 Immediately refresh the cart UI and open the drawer (if present)
         await refreshCartUI({ openDrawer: true });
 
         msgEl.textContent = 'Added to cart ✔';
@@ -548,7 +690,11 @@
     { "type": "product", "id": "product_5", "label": "Product #5" },
     { "type": "product", "id": "product_6", "label": "Product #6" },
     { "type": "header", "content": "Bonus auto-add rule" },
-    { "type": "product", "id": "bonus_product", "label": "Soft Winter Jacket (auto add when Color=Black & Size=Medium)" }
+    {
+      "type": "product",
+      "id": "bonus_product",
+      "label": "Soft Winter Jacket (auto add when Color=Black & Size=Medium)"
+    }
   ],
   "presets": [{ "name": "EE • Product Grid" }]
 }
