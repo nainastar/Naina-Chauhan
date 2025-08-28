@@ -1,11 +1,3 @@
-{% comment %}
-  EE • Product Grid (no jQuery)
-  - 6 product tiles (selectable in customizer)
-  - Click (+) to open modal with dynamic options/variants
-  - Add to cart via fetch('/cart/add.js')
-  - Bonus rule: if Color=Black AND Size=Medium → also add Soft Winter Jacket
-{% endcomment %}
-
 <section id="ee-grid-{{ section.id }}" class="ee-grid">
   <div class="ee-grid__head">
     <h2 class="ee-grid__title">{{ section.settings.heading }}</h2>
@@ -27,7 +19,7 @@
               {{
                 chosen.featured_image
                 | image_url: width: 720
-                | image_tag: alt: chosen.title, loading: 'lazy', class: 'your-class-name'
+                | image_tag: alt: chosen.title, loading: 'lazy'
               }}
             {% endif %}
           </div>
@@ -36,7 +28,7 @@
     {% endfor %}
   </div>
 
-  {%- comment -%} Products JSON payload for JS {%- endcomment -%}
+  <!-- JSON payload -->
   <script type="application/json" id="ee-grid-data-{{ section.id }}">
     {
       "products":[
@@ -83,20 +75,14 @@
     }
   </script>
 
-  <!-- Reusable modal -->
+  <!-- Modal -->
   <div class="ee-modal" aria-hidden="true">
     <div class="ee-modal__backdrop"></div>
-    <div class="ee-modal__dialog" role="dialog" aria-modal="true" aria-label="Quick view">
+    <div class="ee-modal__dialog" role="dialog" aria-modal="true">
       <button class="ee-modal__close" aria-label="Close">×</button>
 
       <div class="ee-modal__media">
-        <img
-          class="ee-modal__img"
-          alt=""
-          width="600"
-          height="400"
-          loading="lazy"
-        >
+        <img class="ee-modal__img" alt="" loading="lazy">
       </div>
 
       <div class="ee-modal__body">
@@ -117,7 +103,7 @@
 
           <button type="submit" class="ee-btn ee-btn--add">
             <span>ADD TO CART</span>
-            <span class="ee-arrow" aria-hidden="true">→</span>
+            <span class="ee-arrow">→</span>
           </button>
           <p class="ee-form__msg" role="status" aria-live="polite"></p>
         </form>
@@ -128,210 +114,98 @@
 
 <style>
   #ee-grid-{{ section.id }}{ --gap:18px; --black:#111; --accent:#FCEB00; }
-  #ee-grid-{{ section.id }} .ee-grid__head{ max-width:1200px; margin:0 auto 10px; padding:0 16px; }
-  #ee-grid-{{ section.id }} .ee-grid__title{ font-size:clamp(22px,2.6vw,36px); margin:10px 0 20px; }
+  .ee-grid__wrap{ max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(3,1fr); gap:var(--gap);}
+  @media(max-width:990px){ .ee-grid__wrap{grid-template-columns:repeat(2,1fr);} }
+  @media(max-width:640px){ .ee-grid__wrap{grid-template-columns:1fr;} }
 
-  #ee-grid-{{ section.id }} .ee-grid__wrap{
-    max-width:1200px; margin:0 auto; padding:0 16px;
-    display:grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap);
-  }
-  @media (max-width: 990px){
-    #ee-grid-{{ section.id }} .ee-grid__wrap{ grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 640px){
-    #ee-grid-{{ section.id }} .ee-grid__wrap{ grid-template-columns: 1fr; }
-  }
+  .ee-card{ position:relative; overflow:hidden; border-radius:6px;}
+  .ee-card__open{position:absolute; right:10px; top:10px; width:32px; height:32px; border-radius:50%; background:#fff; border:1px solid #d9d9d9; cursor:pointer;}
 
-  .ee-card{ position:relative; overflow:hidden; border-radius:6px; }
-  .ee-card__img img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .ee-card__open{
-    position:absolute; right:10px; top:10px; width:32px; height:32px; border-radius:999px;
-    background:#fff; border:1px solid #d9d9d9; font-weight:700; line-height:1; cursor:pointer;
-  }
+  /* Modal Centered */
+  .ee-modal{ position:fixed; inset:0; display:none; z-index:100; justify-content:center; align-items:center; }
+  .ee-modal[aria-hidden="false"]{ display:flex; }
+  .ee-modal__backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.45); animation:fadeIn .3s; }
+  .ee-modal__dialog{ background:#fff; width:380px; padding:18px; border-radius:6px; position:relative; z-index:2; animation:fadeIn .35s ease; }
+  .ee-modal__close{ position:absolute; right:12px; top:8px; background:none; border:none; font-size:22px; cursor:pointer; }
 
-  .ee-modal{ position:fixed; inset:0; display:none; z-index:60; }
-  .ee-modal[aria-hidden="false"]{ display:block; }
-  .ee-modal__backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.45); }
-  .ee-modal__dialog{
-    position:relative; background:#fff; width:min(620px, 92vw); margin:6vh auto;
-    border:1px solid #ddd; border-radius:6px; display:grid; grid-template-columns:160px 1fr; gap:18px;
-    padding:18px;
-  }
-  @media (max-width:640px){ .ee-modal__dialog{ grid-template-columns:1fr; width:min(560px,92vw); } }
-  .ee-modal__close{ position:absolute; right:12px; top:8px; border:none; background:transparent; font-size:22px; cursor:pointer; }
-  .ee-modal__img{ width:100%; height:130px; object-fit:cover; border:1px solid #eee; }
-  .ee-modal__title{ margin:4px 0 2px; font-size:18px; }
-  .ee-modal__price{ font-weight:700; margin-bottom:6px; }
-  .ee-modal__desc{ font-size:14px; line-height:1.4; color:#444; margin:0 0 10px; }
+  .ee-modal__media img{ width:100%; height:200px; object-fit:cover; border:1px solid #eee; }
+  .ee-modal__title{ font-size:18px; margin:8px 0 4px; }
+  .ee-modal__price{ font-weight:700; margin-bottom:8px; }
+  .ee-modal__desc{ font-size:14px; color:#444; margin-bottom:12px; }
 
-  .ee-form__opts{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
-  .ee-label{ display:block; font-size:13px; margin:6px 0 4px; color:#333; }
-  .ee-pill{ border:1px solid #ccc; padding:10px 12px; text-align:left; cursor:pointer; background:#fff; }
-  .ee-pill[aria-pressed="true"]{ outline:2px solid var(--black); border-color:var(--black); }
+  /* Options column */
+  .ee-form__opts{ display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
+  .ee-pill{ border:1px solid #ccc; padding:10px; cursor:pointer; background:#fff; text-align:center; }
+  .ee-pill[aria-pressed="true"]{ background:#000; color:#fff; border-color:#000; }
 
-  .ee-select{ position:relative; }
-  .ee-select select{ appearance:none; width:100%; padding:10px 36px 10px 12px; border:1px solid #ccc; background:#fff; }
-  .ee-select__icon{ position:absolute; right:10px; top:50%; transform:translateY(-50%); pointer-events:none; }
+  /* Size dropdown */
+  .ee-select{ position:relative; display:block; margin-bottom:12px; }
+  .ee-select select{ width:100%; padding:10px 36px 10px 12px; border:1px solid #ccc; cursor:pointer; background:#fff; transition:all .3s;}
+  .ee-select__icon{ position:absolute; right:10px; top:50%; transform:translateY(-50%); transition:transform .3s; }
+  .ee-select select:focus + .ee-select__icon{ transform:translateY(-50%) rotate(180deg); }
+  @keyframes fadeIn{from{opacity:0;} to{opacity:1;}}
 
-  .ee-btn{
-    position:relative; overflow:hidden; isolation:isolate; display:inline-flex; align-items:center; gap:.5rem;
-    padding:.8rem 1.2rem; border:none; background:#000; color:#fff; width:100%; justify-content:center;
-  }
-  .ee-btn::before{ content:""; position:absolute; inset:0; transform:scaleX(0); transform-origin:left; background:var(--accent); transition:transform .5s ease; z-index:-1; }
-  .ee-btn:hover::before{ transform:scaleX(1); }
-  .ee-btn:hover{ color:#000; }
-  .ee-arrow{ margin-left:.4rem; }
-  .ee-form__msg{ margin-top:8px; font-size:13px; color:#0a7a0a; }
+  /* Add to cart button */
+  .ee-btn{ display:inline-flex; justify-content:center; align-items:center; gap:.5rem; width:100%; padding:.9rem 1.2rem; background:#000; color:#fff; border:none; cursor:pointer;}
+  .ee-btn:hover{ background:var(--accent); color:#000; }
 </style>
 
 <script>
-  (() => {
-    const root = document.getElementById('ee-grid-{{ section.id }}');
-    if (!root) return;
+(() => {
+  const root=document.getElementById('ee-grid-{{ section.id }}');
+  if(!root) return;
+  const data=JSON.parse(document.getElementById('ee-grid-data-{{ section.id }}').textContent);
+  const modal=root.querySelector('.ee-modal');
+  const imgEl=modal.querySelector('.ee-modal__img');
+  const titleEl=modal.querySelector('.ee-modal__title');
+  const priceEl=modal.querySelector('.ee-modal__price');
+  const descEl=modal.querySelector('.ee-modal__desc');
+  const optsEl=modal.querySelector('.ee-form__opts');
+  const sizeSel=modal.querySelector('select[name="size"]');
+  const form=modal.querySelector('.ee-form');
+  const msgEl=modal.querySelector('.ee-form__msg');
 
-    const data = JSON.parse(document.getElementById('ee-grid-data-{{ section.id }}').textContent);
-    const modal = root.querySelector('.ee-modal');
-    const closeB = modal.querySelector('.ee-modal__close');
-    const backdrop = modal.querySelector('.ee-modal__backdrop');
+  let activeProduct=null,chosen={};
 
-    const imgEl = modal.querySelector('.ee-modal__img');
-    const titleEl = modal.querySelector('.ee-modal__title');
-    const priceEl = modal.querySelector('.ee-modal__price');
-    const descEl = modal.querySelector('.ee-modal__desc');
-    const optsEl = modal.querySelector('.ee-form__opts');
-    const sizeSel = modal.querySelector('.ee-form [name="size"]');
-    const form = modal.querySelector('.ee-form');
-    const msgEl = modal.querySelector('.ee-form__msg');
+  const open=()=>{modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';};
+  const close=()=>{modal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; msgEl.textContent='';};
+  modal.querySelector('.ee-modal__close').onclick=close;
+  modal.querySelector('.ee-modal__backdrop').onclick=close;
 
-    let activeProduct = null;
-    let chosen = {};
-
-    const openModal = () => {
-      modal.setAttribute('aria-hidden', 'false');
-      document.documentElement.style.overflow = 'hidden';
-    };
-    const closeModal = () => {
-      modal.setAttribute('aria-hidden', 'true');
-      document.documentElement.style.overflow = '';
-      msgEl.textContent = '';
-    };
-
-    closeB.addEventListener('click', closeModal);
-    backdrop.addEventListener('click', closeModal);
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
-    });
-
-    root.querySelectorAll('.ee-card__open').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const article = btn.closest('.ee-card');
-        const handle = article.dataset.handle;
-        const product = data.products.find((p) => p.handle === handle);
-        if (!product) return;
-
-        activeProduct = product;
-        chosen = {};
-
-        imgEl.src = product.featured_image;
-        imgEl.alt = product.title;
-        titleEl.textContent = product.title;
-        priceEl.textContent = product.price_formatted;
-        descEl.textContent = product.description;
-
-        optsEl.innerHTML = '';
-        product.options.slice(0, 2).forEach((opt) => {
-          const wrap = document.createElement('div');
-          wrap.className = 'ee-form__opt';
-          wrap.innerHTML = `<label class="ee-label">${opt.name}</label>`;
-          opt.values.forEach((val) => {
-            const pill = document.createElement('button');
-            pill.type = 'button';
-            pill.className = 'ee-pill';
-            pill.setAttribute('aria-pressed', 'false');
-            pill.textContent = val;
-            pill.addEventListener('click', () => {
-              [...wrap.querySelectorAll('.ee-pill')].forEach((p) => p.setAttribute('aria-pressed', 'false'));
-              pill.setAttribute('aria-pressed', 'true');
-              chosen[opt.name] = val;
-              updateSizes();
-            });
-            wrap.appendChild(pill);
-          });
-          optsEl.appendChild(wrap);
+  root.querySelectorAll('.ee-card__open').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const handle=btn.closest('.ee-card').dataset.handle;
+      const product=data.products.find(p=>p.handle===handle);
+      if(!product) return;
+      activeProduct=product; chosen={};
+      imgEl.src=product.featured_image; titleEl.textContent=product.title;
+      priceEl.textContent=product.price_formatted; descEl.textContent=product.description;
+      optsEl.innerHTML='';
+      product.options.slice(0,1).forEach(opt=>{
+        const wrap=document.createElement('div');
+        wrap.innerHTML=`<label class="ee-label">${opt.name}</label>`;
+        opt.values.forEach(val=>{
+          const pill=document.createElement('button');
+          pill.type='button'; pill.className='ee-pill'; pill.textContent=val;
+          pill.setAttribute('aria-pressed','false');
+          pill.onclick=()=>{wrap.querySelectorAll('.ee-pill').forEach(p=>p.setAttribute('aria-pressed','false')); pill.setAttribute('aria-pressed','true'); chosen[opt.name]=val;};
+          wrap.appendChild(pill);
         });
-
-        sizeSel.innerHTML = '';
-        updateSizes();
-        openModal();
+        optsEl.appendChild(wrap);
       });
+      sizeSel.innerHTML='<option value="">Choose your size</option>'+[...new Set(product.variants.map(v=>v.options[1]))].map(s=>`<option>${s}</option>`).join('');
+      open();
     });
+  });
 
-    function updateSizes() {
-      const sizeOpt = (activeProduct.options.find((o) => /size/i.test(o.name)) || {}).name || 'Size';
-      const colorOpt = (activeProduct.options.find((o) => /color/i.test(o.name)) || {}).name;
-
-      const sizes = new Set();
-      activeProduct.variants.forEach((v) => {
-        if (colorOpt && chosen[colorOpt]) {
-          const colorIdx = activeProduct.options.findIndex((o) => o.name === colorOpt);
-          if (v.options[colorIdx] !== chosen[colorOpt]) return;
-        }
-        const sizeIdx = activeProduct.options.findIndex((o) => o.name === sizeOpt);
-        if (sizeIdx >= 0) sizes.add(v.options[sizeIdx]);
-      });
-
-      const arr = [...sizes];
-      sizeSel.innerHTML =
-        `<option value="" selected>Choose your size</option>` + arr.map((s) => `<option>${s}</option>`).join('');
-    }
-
-    function findVariant() {
-      return activeProduct.variants.find((v) =>
-        activeProduct.options.every((opt, i) => {
-          const want = chosen[opt.name];
-          return !want || v.options[i] === want;
-        })
-      );
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      msgEl.textContent = '';
-
-      const v = findVariant();
-      if (!v) {
-        msgEl.textContent = 'Please select options.';
-        return;
-      }
-
-      try {
-        await fetch('/cart/add.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: v.id, quantity: 1 }),
-        });
-
-        const colorOpt = (activeProduct.options.find((o) => /color/i.test(o.name)) || {}).name;
-        const sizeOpt = (activeProduct.options.find((o) => /size/i.test(o.name)) || {}).name;
-        const pickedColor = colorOpt ? chosen[colorOpt] || '' : '';
-        const pickedSize = sizeOpt ? chosen[sizeOpt] || '' : '';
-
-        if (/black/i.test(pickedColor) && /medium/i.test(pickedSize) && data.autoAdd.variant_id) {
-          await fetch('/cart/add.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: data.autoAdd.variant_id, quantity: 1 }),
-          });
-        }
-
-        msgEl.textContent = 'Added to cart ✔';
-        setTimeout(closeModal, 650);
-      } catch (err) {
-        msgEl.textContent = 'Could not add to cart. Please try again.';
-        console.error(err);
-      }
-    });
-  })();
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const variant=activeProduct.variants.find(v=>activeProduct.options.every((opt,i)=>!chosen[opt.name]||v.options[i]===chosen[opt.name]));
+    if(!variant){ msgEl.textContent='Please select options'; return; }
+    await fetch('/cart/add.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:variant.id,quantity:1})});
+    msgEl.textContent='Added to cart ✔'; setTimeout(close,700);
+  });
+})();
 </script>
 
 {% schema %}
@@ -339,20 +213,14 @@
   "name": "EE • Product Grid",
   "settings": [
     { "type": "text", "id": "heading", "label": "Heading", "default": "Tisso vison in the wild" },
-
     { "type": "product", "id": "product_1", "label": "Product #1" },
     { "type": "product", "id": "product_2", "label": "Product #2" },
     { "type": "product", "id": "product_3", "label": "Product #3" },
     { "type": "product", "id": "product_4", "label": "Product #4" },
     { "type": "product", "id": "product_5", "label": "Product #5" },
     { "type": "product", "id": "product_6", "label": "Product #6" },
-
     { "type": "header", "content": "Bonus auto-add rule" },
-    {
-      "type": "product",
-      "id": "bonus_product",
-      "label": "Soft Winter Jacket (auto add when Color=Black & Size=Medium)"
-    }
+    { "type": "product", "id": "bonus_product", "label": "Soft Winter Jacket" }
   ],
   "presets": [{ "name": "EE • Product Grid" }]
 }
