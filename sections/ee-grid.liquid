@@ -651,7 +651,7 @@
         const colorName = (activeProduct.options.find((o) => /color/i.test(o.name)) || {}).name;
         const pickedColor = colorName ? chosen[colorName] || '' : '';
         const pickedSize = selectedSize || '';
-        if (/black/i.test(pickedColor) && /medium/i.test(pickedSize) && payload.autoAdd && payload.autoAdd.variant_id) {
+        if (/black/i.test(pickedColor) && /M/i.test(pickedSize) && payload.autoAdd && payload.autoAdd.variant_id) {
           await fetch('/cart/add.js', {
             method: 'POST',
             credentials: 'include',
