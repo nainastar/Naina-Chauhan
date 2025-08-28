@@ -41,6 +41,7 @@
       style="--bg:url({{ section.settings.bg_image | image_url }})"
     {% endif %}
   >
+    <!-- Text block -->
     <div class="ee-banner__inner">
       <h1 class="ee-banner__title">{{ section.settings.title }}</h1>
       {% if section.settings.subtitle != blank %}
@@ -54,6 +55,9 @@
         </a>
       {% endif %}
     </div>
+
+    <!-- Mobile-only image block (keeps text on white, image below) -->
+    <div class="ee-hero-img" aria-hidden="true"></div>
   </div>
 
   {% if section.settings.bottom_strip != blank %}
@@ -145,24 +149,34 @@
   }
   #ee-banner-{{ section.id }} .ee-mobile-tagline{ margin:0 0 12px; font-weight:600; }
 
-  /* Hero (content pushed to bottom) */
+  /* Hero (desktop: text sits in white area above image) */
   #ee-banner-{{ section.id }} .ee-banner__hero{
     background: var(--white);
     background-image: var(--bg);
-    background-size: cover; background-position: center;
+    background-size: cover; background-position: center 40%; /* push art slightly down */
     min-height: 520px;
 
-    display:flex;                 /* bottom alignment */
+    display:flex;
     align-items:flex-end;         /* push inner to bottom */
-    justify-content:center;       /* center horizontally */
+    justify-content:center;
+    position:relative;
   }
   #ee-banner-{{ section.id }} .ee-banner__inner{
     width:100%; max-width:var(--max);
-    padding: 40px var(--pad) 60px;  /* extra bottom padding */
+    padding: 36px var(--pad) 56px;  /* bottom padding like comp */
     text-align:left;
   }
-  #ee-banner-{{ section.id }} .ee-banner__title{ font-size: clamp(42px, 6vw, 80px); line-height:1.05; margin:.25em 0; }
-  #ee-banner-{{ section.id }} .ee-banner__subtitle{ max-width: 720px; font-size: 1rem; line-height:1.6; color:#333; }
+  /* Slightly smaller text to fit in white band */
+  #ee-banner-{{ section.id }} .ee-banner__title{
+    font-size: clamp(36px, 5.2vw, 72px);
+    line-height:1.05; margin:.2em 0 .1em;
+  }
+  #ee-banner-{{ section.id }} .ee-banner__subtitle{
+    max-width: 680px; font-size: .98rem; line-height:1.55; color:#333;
+  }
+
+  /* Mobile image block: hidden on desktop */
+  #ee-banner-{{ section.id }} .ee-hero-img{ display:none; }
 
   /* Bottom strip */
   #ee-banner-{{ section.id }} .ee-banner__strip{
@@ -186,12 +200,35 @@
       font-size:1rem; padding: 12px var(--pad);
     }
 
-    /* Hero compact + bottom-centered content */
-    #ee-banner-{{ section.id }} .ee-banner__hero{ min-height: 380px; padding: 0 var(--pad); }
-    #ee-banner-{{ section.id }} .ee-banner__inner{ text-align:center; padding: 30px var(--pad) 40px; }
-    #ee-banner-{{ section.id }} .ee-banner__title{ font-size: 2rem; margin-bottom: .6rem; }
-    #ee-banner-{{ section.id }} .ee-banner__subtitle{ font-size:.95rem; max-width: 90%; margin:0 auto 1.2rem; }
-    #ee-banner-{{ section.id }} .ee-btn--primary{ margin: 0 auto; display:inline-flex; }
+    /* MOBILE: text on white first, image below */
+    #ee-banner-{{ section.id }} .ee-banner__hero{
+      background:none;            /* remove background from container */
+      min-height:auto;            /* let content define height */
+      align-items:stretch;
+    }
+    #ee-banner-{{ section.id }} .ee-banner__inner{
+      text-align:center;
+      padding: 22px var(--pad) 16px;   /* compact and in white area */
+      background:#fff;
+    }
+    #ee-banner-{{ section.id }} .ee-banner__title{
+      font-size: 1.75rem;         /* ~28px */
+      margin-bottom:.5rem;
+    }
+    #ee-banner-{{ section.id }} .ee-banner__subtitle{
+      font-size:.95rem; max-width: 92%; margin:0 auto 1rem; line-height:1.5;
+    }
+    #ee-banner-{{ section.id }} .ee-btn--primary{
+      margin: 0 auto; display:inline-flex;
+    }
+
+    /* The image portion appears below text */
+    #ee-banner-{{ section.id }} .ee-hero-img{
+      display:block; height: 230px;      /* adjust to match comp height */
+      background-image: var(--bg);
+      background-size: cover;
+      background-position: center;
+    }
 
     /* Bottom strip tighter */
     #ee-banner-{{ section.id }} .ee-banner__strip{ font-size:.7rem; padding:6px 8px; }
