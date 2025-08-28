@@ -171,6 +171,14 @@
     background:#eee; font-size:.78rem; padding:8px 12px; border-top:1px solid #ddd; letter-spacing:.06em;font-weight: 700;
   }
 
+    /* Desktop subtitle – show full */
+    #ee-banner-{{ section.id }} .ee-banner__subtitle{
+        overflow: visible;
+        text-overflow: initial;
+        -webkit-line-clamp: unset;
+        -webkit-box-orient: unset;
+    }
+
 
   /* ---------- Mobile ---------- */
   @media (max-width: 768px){
