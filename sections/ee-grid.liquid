@@ -99,13 +99,20 @@
       <form class="ee-form" novalidate>
         <div class="ee-form__opts"><!-- Color pills injected here --></div>
 
-        <!-- custom size dropdown -->
+        <!-- custom size dropdown (with label + black hover area) -->
         <div class="ee-dd" data-name="size">
-          <button type="button" class="ee-dd__btn" aria-haspopup="listbox" aria-expanded="false">
+          <label id="ee-size-label-{{ section.id }}" class="ee-label ee-dd__field-label">Size</label>
+          <button
+            type="button"
+            class="ee-dd__btn"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-labelledby="ee-size-label-{{ section.id }}"
+          >
             <span class="ee-dd__label">Choose your size</span>
             <span class="ee-dd__icon">▾</span>
           </button>
-          <ul class="ee-dd__list" role="listbox"></ul>
+          <ul class="ee-dd__list" role="listbox" aria-labelledby="ee-size-label-{{ section.id }}"></ul>
         </div>
 
         <button type="submit" class="ee-btn ee-btn--add">
@@ -125,7 +132,22 @@
 
   .ee-grid__wrap{ max-width:1200px; margin:0 auto; padding:0 16px; display:grid; grid-template-columns:repeat(3,1fr); gap:var(--gap); }
   @media(max-width:990px){ .ee-grid__wrap{ grid-template-columns:repeat(2,1fr); } }
-  @media(max-width:640px){ .ee-grid__wrap{ grid-template-columns:1fr; } }
+  /* MOBILE: 2 columns */
+  @media(max-width:640px){ .ee-grid__wrap{ grid-template-columns:repeat(2,1fr); } }
+
+  /* MOBILE: center heading, no left/right margin */
+  @media(max-width:640px){
+    .ee-grid__head{
+      margin: 0 0 24px 0;
+      padding: 0;
+      max-width: 100%;
+    }
+    .ee-grid__title{
+      text-align: center;
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
 
   .ee-card{ position:relative; overflow:hidden; border-radius:6px; }
   .ee-card__img img{ display:block; width:100%; height:100%; object-fit:cover; }
@@ -162,9 +184,23 @@
 
   /* Custom dropdown */
   .ee-dd{ position:relative; margin:6px 0 14px; }
+  .ee-dd__field-label{
+    display:block;
+    font-size:13px;
+    color:#333;
+    margin:6px 0 6px;
+  }
   .ee-dd__btn{
     width:100%; display:flex; justify-content:space-between; align-items:center;
     padding:10px 12px; border:1px solid #ccc; background:#fff; cursor:pointer;
+    transition: background .25s ease, color .25s ease, border-color .25s ease;
+  }
+  .ee-dd__btn:hover,
+  .ee-dd__btn:focus-visible{
+    background:#000;
+    color:#fff;
+    border-color:#000;
+    outline:none;
   }
   .ee-dd__icon{ transition:transform .6s ease; }
   .ee-dd.open .ee-dd__icon{ transform:rotate(180deg); }
@@ -174,8 +210,9 @@
     pointer-events:none; transition:opacity .6s ease, transform .6s ease;
   }
   .ee-dd.open .ee-dd__list{ opacity:1; transform:translateY(0); pointer-events:auto; }
-  .ee-dd__list li{ padding:12px; cursor:pointer; }
-  .ee-dd__list li:hover{ background:#000; color:#fff; }
+  .ee-dd__list li{ padding:12px; cursor:pointer; transition: background .2s ease, color .2s ease; }
+  .ee-dd__list li:hover,
+  .ee-dd__list li:focus{ background:#000; color:#fff; }
 
   /* Add to cart: keep black on hover */
   .ee-btn{
