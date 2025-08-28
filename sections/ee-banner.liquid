@@ -17,11 +17,14 @@
     {% endif %}
   </div>
 
-  <div class="ee-banner__hero" role="img"
-       aria-label="{{ section.settings.bg_alt | escape }}"
-       {% if section.settings.bg_image %}
-         style="--bg:url({{ section.settings.bg_image | image_url }})"
-       {% endif %}>
+  <div
+    class="ee-banner__hero"
+    role="img"
+    aria-label="{{ section.settings.bg_alt | escape }}"
+    {% if section.settings.bg_image %}
+      style="--bg:url({{ section.settings.bg_image | image_url }})"
+    {% endif %}
+  >
     <div class="ee-banner__inner">
       <h1 class="ee-banner__title">{{ section.settings.title }}</h1>
       {% if section.settings.subtitle != blank %}
@@ -45,87 +48,94 @@
 </section>
 
 <style>
-  /* ---- Scoped styles ---- */
-  #ee-banner-{{ section.id }} {
-    --max: 1200px;
-    --pad: 20px;
-    --black: #111;
-    --white: #fff;
-    --accent: #FCEB00; /* yellow */
-    --gray: #efefef;
-  }
-
-  /* Top bar */
-  #ee-banner-{{ section.id }} .ee-banner__topbar{
-    display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
-    gap:16px; background:#f3f3f3; padding:10px var(--pad); font-weight:600;
-  }
-  #ee-banner-{{ section.id }} .ee-banner__brand{justify-self:start}
-  #ee-banner-{{ section.id }} .ee-banner__tagline{justify-self:center; text-align:center}
-
-  /* Buttons – base */
-  #ee-banner-{{ section.id }} .ee-btn{
-    position:relative; overflow:hidden; isolation:isolate;
-    display:inline-flex; align-items:center; gap:.5rem;
-    padding:.55rem 1rem; border:1px solid #000; text-decoration:none;
-    line-height:1; cursor:pointer;
-  }
-  #ee-banner-{{ section.id }} .ee-btn .ee-arrow{display:inline-block}
-
-  /* Left→Right fill animation via ::before */
-  #ee-banner-{{ section.id }} .ee-btn::before{
-    content:""; position:absolute; inset:0; transform:scaleX(0);
-    transform-origin:left; transition:transform .28s ease;
-    z-index:-1;
-  }
-  #ee-banner-{{ section.id }} .ee-btn:hover::before{ transform:scaleX(1); }
-
-  /* Top right button (CHOOSE GIFT): outline -> fill black */
-  #ee-banner-{{ section.id }} .ee-btn--top{
-    background:transparent; color:#000; border-color:#000;
-  }
-  #ee-banner-{{ section.id }} .ee-btn--top::before{ background:#000; }
-  #ee-banner-{{ section.id }} .ee-btn--top:hover{ color:#fff; }
-
-  /* Main CTA (SHOP NOW): black -> fill yellow */
-  #ee-banner-{{ section.id }} .ee-btn--primary{
-    background:#000; color:#fff; border-color:#000;
-  }
-  #ee-banner-{{ section.id }} .ee-btn--primary::before{ background:var(--accent); }
-  #ee-banner-{{ section.id }} .ee-btn--primary:hover{ color:#000; }
-
-  /* Hero */
-  #ee-banner-{{ section.id }} .ee-banner__hero{
-    background: var(--white);
-    background-image: var(--bg);
-    background-size: cover; background-position: center;
-    min-height: 520px; display:grid; place-items:center;
-  }
-  #ee-banner-{{ section.id }} .ee-banner__inner{
-    width:100%; max-width:var(--max); padding: 40px var(--pad);
-  }
-  #ee-banner-{{ section.id }} .ee-banner__title{
-    font-size: clamp(42px, 6vw, 80px); line-height:1.05; margin:.25em 0;
-  }
-  #ee-banner-{{ section.id }} .ee-banner__subtitle{
-    max-width: 720px; font-size: 1rem; line-height:1.6; color:#333;
-  }
-
-  /* Bottom strip */
-  #ee-banner-{{ section.id }} .ee-banner__strip{
-    display:flex; justify-content:center; align-items:center;
-    background:#eee; font-size:.78rem; padding:8px 12px; border-top:1px solid #ddd;
-    letter-spacing:.06em
-  }
-
-  /* Mobile */
-  @media (max-width: 768px){
-    #ee-banner-{{ section.id }} .ee-banner__topbar{
-      grid-template-columns: auto 1fr auto; font-size:.9rem;
+    /* ---- Scoped styles ---- */
+    #ee-banner-{{ section.id }} {
+      --max: 1200px;
+      --pad: 20px;
+      --black: #111;
+      --white: #fff;
+      --accent: #FCEB00; /* yellow */
+      --gray: #efefef;
     }
-    #ee-banner-{{ section.id }} .ee-banner__hero{ min-height: 420px; }
-    #ee-banner-{{ section.id }} .ee-banner__subtitle{ max-width: 100%; }
-  }
+
+    /* Top bar */
+    #ee-banner-{{ section.id }} .ee-banner__topbar{
+      display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+      gap:16px; background:#f3f3f3; padding:10px var(--pad); font-weight:600;
+    }
+    #ee-banner-{{ section.id }} .ee-banner__brand{justify-self:start}
+    #ee-banner-{{ section.id }} .ee-banner__tagline{justify-self:center; text-align:center}
+
+    /* Buttons – base */
+    #ee-banner-{{ section.id }} .ee-btn{
+      position:relative; overflow:hidden; isolation:isolate;
+      display:inline-flex; align-items:center; gap:.5rem;
+      padding:.55rem 1rem; border:1px solid #000; text-decoration:none;
+      line-height:1; cursor:pointer;
+    }
+    #ee-banner-{{ section.id }} .ee-btn .ee-arrow{display:inline-block}
+
+    /* Left→Right fill animation via ::before */
+    #ee-banner-{{ section.id }} .ee-btn::before{
+      content:""; position:absolute; inset:0; transform:scaleX(0);
+      transform-origin:left; transition:transform .28s ease;
+      z-index:-1;
+    }
+    #ee-banner-{{ section.id }} .ee-btn:hover::before{ transform:scaleX(1); }
+
+    /* Top right button (CHOOSE GIFT): yellow base → fill black on hover */
+    #ee-banner-{{ section.id }} .ee-btn--top{
+        background: var(--accent);   /* yellow background */
+        color:#000;                  /* black text */
+        border:1px solid #000;       /* black border */
+        font-weight:600;
+        width:auto;                  /* shrink to fit text */
+        white-space:nowrap;          /* prevent wrapping */
+    }
+
+    #ee-banner-{{ section.id }} .ee-btn--top::before{ background:#000; }
+    #ee-banner-{{ section.id }} .ee-btn--top:hover{ color:#fff; }
+
+
+    /* Main CTA (SHOP NOW): black -> fill yellow */
+    #ee-banner-{{ section.id }} .ee-btn--primary{
+      background:#000; color:#fff; border-color:#000;
+    }
+    #ee-banner-{{ section.id }} .ee-btn--primary::before{ background:var(--accent); }
+    #ee-banner-{{ section.id }} .ee-btn--primary:hover{ color:#000; }
+
+    /* Hero */
+    #ee-banner-{{ section.id }} .ee-banner__hero{
+      background: var(--white);
+      background-image: var(--bg);
+      background-size: cover; background-position: center;
+      min-height: 520px; display:grid; place-items:center;
+    }
+    #ee-banner-{{ section.id }} .ee-banner__inner{
+      width:100%; max-width:var(--max); padding: 40px var(--pad);
+    }
+    #ee-banner-{{ section.id }} .ee-banner__title{
+      font-size: clamp(42px, 6vw, 80px); line-height:1.05; margin:.25em 0;
+    }
+    #ee-banner-{{ section.id }} .ee-banner__subtitle{
+      max-width: 720px; font-size: 1rem; line-height:1.6; color:#333;
+    }
+
+    /* Bottom strip */
+    #ee-banner-{{ section.id }} .ee-banner__strip{
+      display:flex; justify-content:center; align-items:center;
+      background:#eee; font-size:.78rem; padding:8px 12px; border-top:1px solid #ddd;
+      letter-spacing:.06em
+    }
+
+    /* Mobile */
+    @media (max-width: 768px){
+      #ee-banner-{{ section.id }} .ee-banner__topbar{
+        grid-template-columns: auto 1fr auto; font-size:.9rem;
+      }
+      #ee-banner-{{ section.id }} .ee-banner__hero{ min-height: 420px; }
+      #ee-banner-{{ section.id }} .ee-banner__subtitle{ max-width: 100%; }
+    }
 </style>
 
 {% schema %}
@@ -133,20 +143,35 @@
   "name": "EE • Banner",
   "tag": "section",
   "settings": [
-    { "type":"text", "id":"brand_text", "label":"Brand (top-left)", "default":"TISSO VISION" },
-    { "type":"text", "id":"tagline", "label":"Top center tagline", "default":"Find the ideal gift for your loved ones." },
-    { "type":"text", "id":"top_cta_text", "label":"Top right button text", "default":"CHOOSE GIFT" },
-    { "type":"url",  "id":"top_cta_link", "label":"Top right button link" },
+    { "type": "text", "id": "brand_text", "label": "Brand (top-left)", "default": "TISSO VISION" },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Top center tagline",
+      "default": "Find the ideal gift for your loved ones."
+    },
+    { "type": "text", "id": "top_cta_text", "label": "Top right button text", "default": "CHOOSE GIFT" },
+    { "type": "url", "id": "top_cta_link", "label": "Top right button link" },
 
-    { "type":"text", "id":"title", "label":"Main Title", "default":"The Gift Guide" },
-    { "type":"textarea", "id":"subtitle", "label":"Subtitle paragraph", "default":"Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season." },
-    { "type":"text", "id":"main_cta_text", "label":"Main CTA text", "default":"SHOP NOW" },
-    { "type":"url",  "id":"main_cta_link", "label":"Main CTA link" },
+    { "type": "text", "id": "title", "label": "Main Title", "default": "The Gift Guide" },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle paragraph",
+      "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season."
+    },
+    { "type": "text", "id": "main_cta_text", "label": "Main CTA text", "default": "SHOP NOW" },
+    { "type": "url", "id": "main_cta_link", "label": "Main CTA link" },
 
-    { "type":"image_picker", "id":"bg_image", "label":"Background image (hero)" },
-    { "type":"text", "id":"bg_alt", "label":"Background image alt", "default":"Gift guide background" },
+    { "type": "image_picker", "id": "bg_image", "label": "Background image (hero)" },
+    { "type": "text", "id": "bg_alt", "label": "Background image alt", "default": "Gift guide background" },
 
-    { "type":"text", "id":"bottom_strip", "label":"Bottom strip text", "default":"SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL" }
+    {
+      "type": "text",
+      "id": "bottom_strip",
+      "label": "Bottom strip text",
+      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
+    }
   ],
   "presets": [{ "name": "EE • Banner" }]
 }
