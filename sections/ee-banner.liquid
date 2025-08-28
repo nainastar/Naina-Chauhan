@@ -142,15 +142,55 @@
         white-space: nowrap; /* prevent wrapping */
     }
 
+    /* Mobile adjustments */
+    @media (max-width: 768px){
 
-  /* Mobile */
-  @media (max-width: 768px){
-    #ee-banner-{{ section.id }} .ee-banner__topbar{
-      grid-template-columns: auto 1fr auto; font-size:.9rem;
+    /* Hide tagline + top CTA in topbar */
+    #ee-banner-{{ section.id }} .ee-banner__tagline,
+    #ee-banner-{{ section.id }} .ee-banner__topbar .ee-btn--top {
+        display:none;
     }
-    #ee-banner-{{ section.id }} .ee-banner__hero{ min-height: 420px; }
-    #ee-banner-{{ section.id }} .ee-banner__subtitle{ max-width: 100%; }
-  }
+
+    #ee-banner-{{ section.id }} .ee-banner__topbar{
+        grid-template-columns: auto 1fr auto;
+        font-size:1rem;
+        padding: 12px var(--pad);
+    }
+
+    /* Hero smaller height */
+    #ee-banner-{{ section.id }} .ee-banner__hero{
+        min-height: 380px;
+        padding: 20px var(--pad);
+    }
+
+    /* Inner text stacked center */
+    #ee-banner-{{ section.id }} .ee-banner__inner{
+        text-align:center;
+        padding: 20px var(--pad);
+    }
+    #ee-banner-{{ section.id }} .ee-banner__title{
+        font-size: 2rem;
+        margin-bottom: .6rem;
+    }
+    #ee-banner-{{ section.id }} .ee-banner__subtitle{
+        font-size:.95rem;
+        max-width: 90%;
+        margin:0 auto 1.2rem;
+    }
+
+    /* SHOP NOW button center */
+    #ee-banner-{{ section.id }} .ee-btn--primary{
+        margin: 0 auto;
+        display:inline-flex;
+    }
+
+    /* Bottom strip tighter */
+    #ee-banner-{{ section.id }} .ee-banner__strip{
+        font-size:.7rem;
+        padding:6px 8px;
+    }
+    }
+
 </style>
 
 {% schema %}
