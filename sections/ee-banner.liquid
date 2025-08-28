@@ -1,8 +1,8 @@
 {% comment %}
   EcomExperts Test – Custom Banner Section (no jQuery)
-  - Editable fields: logo/brand (top-left), tagline (center), top CTA (right),
-    main title, subtitle/description, main CTA, bottom strip text, background image.
-  - Button animation: subtle scale + arrow slide.
+  - Editable fields: brand (top-left), tagline (center), top CTA (right),
+    main title, subtitle, main CTA, bottom strip text, background image.
+  - Button animation: single left→right fill (no other animations).
 {% endcomment %}
 
 <section id="ee-banner-{{ section.id }}" class="ee-banner">
@@ -23,9 +23,6 @@
          style="--bg:url({{ section.settings.bg_image | image_url }})"
        {% endif %}>
     <div class="ee-banner__inner">
-      {% if section.settings.kicker != blank %}
-        <p class="ee-banner__kicker">{{ section.settings.kicker }}</p>
-      {% endif %}
       <h1 class="ee-banner__title">{{ section.settings.title }}</h1>
       {% if section.settings.subtitle != blank %}
         <p class="ee-banner__subtitle">{{ section.settings.subtitle }}</p>
@@ -54,26 +51,50 @@
     --pad: 20px;
     --black: #111;
     --white: #fff;
-    --accent: #FCEB00; /* yellow button */
+    --accent: #FCEB00; /* yellow */
     --gray: #efefef;
   }
+
+  /* Top bar */
   #ee-banner-{{ section.id }} .ee-banner__topbar{
     display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
-    gap:16px; background:#f3f3f3; padding:10px var(--pad);
-    font-weight:600
+    gap:16px; background:#f3f3f3; padding:10px var(--pad); font-weight:600;
   }
   #ee-banner-{{ section.id }} .ee-banner__brand{justify-self:start}
   #ee-banner-{{ section.id }} .ee-banner__tagline{justify-self:center; text-align:center}
-  #ee-banner-{{ section.id }} .ee-btn{
-    display:inline-flex; align-items:center; gap:.5rem; border:1px solid #000;
-    padding:.1rem 1rem; background:var(--accent); text-decoration:none; color:#000;
-    transition: transform .15s ease, box-shadow .15s ease;
-    will-change: transform;
-  }
-  #ee-banner-{{ section.id }} .ee-btn:hover { transform: translateY(-1px); box-shadow:0 4px 0 #000; }
-  #ee-banner-{{ section.id }} .ee-btn .ee-arrow{display:inline-block; transition:transform .15s ease}
-  #ee-banner-{{ section.id }} .ee-btn:hover .ee-arrow{ transform: translateX(4px); }
 
+  /* Buttons – base */
+  #ee-banner-{{ section.id }} .ee-btn{
+    position:relative; overflow:hidden; isolation:isolate;
+    display:inline-flex; align-items:center; gap:.5rem;
+    padding:.55rem 1rem; border:1px solid #000; text-decoration:none;
+    line-height:1; cursor:pointer;
+  }
+  #ee-banner-{{ section.id }} .ee-btn .ee-arrow{display:inline-block}
+
+  /* Left→Right fill animation via ::before */
+  #ee-banner-{{ section.id }} .ee-btn::before{
+    content:""; position:absolute; inset:0; transform:scaleX(0);
+    transform-origin:left; transition:transform .28s ease;
+    z-index:-1;
+  }
+  #ee-banner-{{ section.id }} .ee-btn:hover::before{ transform:scaleX(1); }
+
+  /* Top right button (CHOOSE GIFT): outline -> fill black */
+  #ee-banner-{{ section.id }} .ee-btn--top{
+    background:transparent; color:#000; border-color:#000;
+  }
+  #ee-banner-{{ section.id }} .ee-btn--top::before{ background:#000; }
+  #ee-banner-{{ section.id }} .ee-btn--top:hover{ color:#fff; }
+
+  /* Main CTA (SHOP NOW): black -> fill yellow */
+  #ee-banner-{{ section.id }} .ee-btn--primary{
+    background:#000; color:#fff; border-color:#000;
+  }
+  #ee-banner-{{ section.id }} .ee-btn--primary::before{ background:var(--accent); }
+  #ee-banner-{{ section.id }} .ee-btn--primary:hover{ color:#000; }
+
+  /* Hero */
   #ee-banner-{{ section.id }} .ee-banner__hero{
     background: var(--white);
     background-image: var(--bg);
@@ -83,15 +104,14 @@
   #ee-banner-{{ section.id }} .ee-banner__inner{
     width:100%; max-width:var(--max); padding: 40px var(--pad);
   }
-  #ee-banner-{{ section.id }} .ee-banner__kicker{
-    letter-spacing:.18em; font-size:.75rem; margin:0 0 .5rem 0;
-  }
   #ee-banner-{{ section.id }} .ee-banner__title{
     font-size: clamp(42px, 6vw, 80px); line-height:1.05; margin:.25em 0;
   }
   #ee-banner-{{ section.id }} .ee-banner__subtitle{
     max-width: 720px; font-size: 1rem; line-height:1.6; color:#333;
   }
+
+  /* Bottom strip */
   #ee-banner-{{ section.id }} .ee-banner__strip{
     display:flex; justify-content:center; align-items:center;
     background:#eee; font-size:.78rem; padding:8px 12px; border-top:1px solid #ddd;
@@ -118,7 +138,6 @@
     { "type":"text", "id":"top_cta_text", "label":"Top right button text", "default":"CHOOSE GIFT" },
     { "type":"url",  "id":"top_cta_link", "label":"Top right button link" },
 
-    { "type":"text", "id":"kicker", "label":"Small kicker above title" },
     { "type":"text", "id":"title", "label":"Main Title", "default":"The Gift Guide" },
     { "type":"textarea", "id":"subtitle", "label":"Subtitle paragraph", "default":"Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season." },
     { "type":"text", "id":"main_cta_text", "label":"Main CTA text", "default":"SHOP NOW" },
