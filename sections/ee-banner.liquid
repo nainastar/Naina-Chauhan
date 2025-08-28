@@ -1,13 +1,12 @@
 {% comment %}
   EcomExperts Test – Custom Banner Section (no jQuery)
-  - Mobile: hamburger at left that morphs to X and reveals a dropdown with tagline + CTA
-  - Mobile hero: text on white first, image below with overlaid SHOP NOW button
-  - Desktop: smaller title/subtitle per request
+  - Mobile: hamburger (☰) toggles drawer with tagline + CTA
+  - Mobile hero: text on white first, image below with overlaid SHOP NOW
+  - Desktop: smaller title/subtitle per assignment
 {% endcomment %}
 
 <section id="ee-banner-{{ section.id }}" class="ee-banner">
   <div class="ee-banner__topbar">
-    <!-- Mobile hamburger (hidden on desktop) -->
     <button class="ee-hamburger" aria-expanded="false" aria-controls="ee-mobile-drawer-{{ section.id }}" aria-label="Open menu">
       <span class="ee-hamburger__bar"></span>
     </button>
@@ -23,7 +22,7 @@
     {% endif %}
   </div>
 
-  <!-- Mobile dropdown panel -->
+  <!-- Mobile dropdown under topbar -->
   <div id="ee-mobile-drawer-{{ section.id }}" class="ee-mobile-drawer" aria-hidden="true">
     <p class="ee-mobile-tagline">{{ section.settings.tagline }}</p>
     {% if section.settings.top_cta_text != blank %}
@@ -56,8 +55,16 @@
       {% endif %}
     </div>
 
-    <!-- Mobile-only image + overlay button -->
+    <!-- Mobile-only image with overlaid button -->
     <div class="ee-hero-img" aria-hidden="true">
+      {% if section.settings.bg_image %}
+        <img
+          class="ee-hero-img__img"
+          src="{{ section.settings.bg_image | image_url: width: 1600 }}"
+          alt="{{ section.settings.bg_alt | escape }}"
+          loading="lazy"
+        >
+      {% endif %}
       {% if section.settings.main_cta_text != blank %}
         <a class="ee-btn ee-btn--primary ee-btn--mobile-overlay" href="{{ section.settings.main_cta_link | default: '#' }}">
           <span>{{ section.settings.main_cta_text }}</span>
@@ -81,11 +88,11 @@
     --pad: 20px;
     --black: #111;
     --white: #fff;
-    --accent: #FCEB00; /* yellow */
+    --accent: #FCEB00;
     --gray: #efefef;
   }
 
-  /* Top bar layout */
+  /* Top bar */
   #ee-banner-{{ section.id }} .ee-banner__topbar{
     display:grid; grid-template-columns:auto 1fr auto; align-items:center;
     gap:16px; background:#f3f3f3; padding:10px var(--pad); font-weight:600;
@@ -109,26 +116,21 @@
   #ee-banner-{{ section.id }} .ee-hamburger[aria-expanded="true"] .ee-hamburger__bar::before{ top:0; transform:rotate(45deg); }
   #ee-banner-{{ section.id }} .ee-hamburger[aria-expanded="true"] .ee-hamburger__bar::after{ bottom:0; transform:rotate(-45deg); }
 
-  /* Buttons – base (no border, fit text) */
+  /* Buttons – base */
   #ee-banner-{{ section.id }} .ee-btn{
     position:relative; overflow:hidden; isolation:isolate;
     display:inline-flex; align-items:center; gap:.5rem;
     padding:.55rem 1.2rem; text-decoration:none; line-height:1; cursor:pointer;
     border:none; outline:none; width:max-content; white-space:nowrap;
   }
-  /* Left→Right fill animation */
   #ee-banner-{{ section.id }} .ee-btn::before{
     content:""; position:absolute; inset:0; transform:scaleX(0);
     transform-origin:left; transition:transform .6s ease; z-index:-1;
   }
   #ee-banner-{{ section.id }} .ee-btn:hover::before{ transform:scaleX(1); }
-
-  /* Top CTA */
   #ee-banner-{{ section.id }} .ee-btn--top{ background:var(--accent); color:#000; font-weight:600; }
   #ee-banner-{{ section.id }} .ee-btn--top::before{ background:#000; }
   #ee-banner-{{ section.id }} .ee-btn--top:hover{ color:#fff; }
-
-  /* Main CTA */
   #ee-banner-{{ section.id }} .ee-btn--primary{ background:#000; color:#fff; padding:.65rem 1.3rem; }
   #ee-banner-{{ section.id }} .ee-btn--primary::before{ background:var(--accent); }
   #ee-banner-{{ section.id }} .ee-btn--primary:hover{ color:#000; }
@@ -143,7 +145,7 @@
   #ee-banner-{{ section.id }}.menu-open .ee-mobile-drawer{ max-height:220px; padding:14px var(--pad) 18px; box-shadow:0 2px 0 #e8e8e8; }
   #ee-banner-{{ section.id }} .ee-mobile-tagline{ margin:0 0 12px; font-weight:600; }
 
-  /* Hero (desktop) — text sits in white band, image in background */
+  /* Hero (desktop) */
   #ee-banner-{{ section.id }} .ee-banner__hero{
     background: var(--white);
     background-image: var(--bg);
@@ -156,11 +158,11 @@
     padding: 36px var(--pad) 56px;
     text-align:left;
   }
-  /* Desktop: ~50% smaller title + smaller subtitle */
+  /* Desktop smaller */
   #ee-banner-{{ section.id }} .ee-banner__title{ font-size: clamp(24px, 3vw, 36px); line-height:1.1; margin:.2em 0 .1em; }
   #ee-banner-{{ section.id }} .ee-banner__subtitle{ max-width: 560px; font-size: .75rem; line-height:1.5; color:#333; }
 
-  /* Mobile image block hidden on desktop */
+  /* Mobile image container (hidden on desktop) */
   #ee-banner-{{ section.id }} .ee-hero-img{ display:none; }
 
   /* Bottom strip */
@@ -179,27 +181,34 @@
     #ee-banner-{{ section.id }} .ee-mobile-drawer{ display:block; }
     #ee-banner-{{ section.id }} .ee-banner__topbar{ grid-template-columns: auto 1fr auto; font-size:1rem; padding: 12px var(--pad); }
 
-    /* Text first on white */
+    /* Text on white first */
     #ee-banner-{{ section.id }} .ee-banner__hero{ background:none; min-height:auto; align-items:stretch; }
     #ee-banner-{{ section.id }} .ee-banner__inner{ text-align:center; padding: 22px var(--pad) 12px; background:#fff; }
     #ee-banner-{{ section.id }} .ee-banner__title{ font-size: 1.7rem; margin-bottom:.45rem; }
     #ee-banner-{{ section.id }} .ee-banner__subtitle{ font-size:.95rem; max-width: 92%; margin:0 auto .8rem; }
 
-    /* Hide desktop button and show overlay one */
+    /* Hide desktop button */
     #ee-banner-{{ section.id }} .ee-banner__inner .ee-btn--primary{ display:none; }
 
     /* Image below with overlay button */
     #ee-banner-{{ section.id }} .ee-hero-img{
-      display:block; height: 240px;
-      background-image: var(--bg); background-size: cover; background-position:center;
-      position:relative;
+      display:block; width:100%; height: 260px;
+      position:relative; overflow:hidden;
+      background-image: var(--bg);           /* in case <img> fails */
+      background-size: cover; background-position:center;
+      border-top: 1px solid #eee;
+    }
+    #ee-banner-{{ section.id }} .ee-hero-img__img{
+      position:absolute; inset:0; width:100%; height:100%;
+      object-fit:cover; display:block; z-index:0;
     }
     #ee-banner-{{ section.id }} .ee-btn--mobile-overlay{
       position:absolute; left:50%; transform:translateX(-50%);
-      bottom:18px;
+      bottom:16px; z-index:1;
+      max-width: calc(100vw - 32px); /* keep inside viewport */
     }
 
-    /* Bottom strip tighter */
+    /* Strip tighter */
     #ee-banner-{{ section.id }} .ee-banner__strip{ font-size:.7rem; padding:6px 8px; }
   }
 </style>
