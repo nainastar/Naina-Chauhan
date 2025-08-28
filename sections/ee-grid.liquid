@@ -263,7 +263,7 @@
         const colorOpt = p.options.find((o) => /color/i.test(o.name));
         if (colorOpt) {
           const block = document.createElement('div');
-          block.innerHTML = `<label class="ee-label">${colorOpt.name}</label>`;
+          block.innerHTML = `<label class="ee-label">${colorOpt.name}</label><br/>`;
           colorOpt.values.forEach((val) => {
             const pill = document.createElement('button');
             pill.type = 'button';
